@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proj_comp_movel/pages/pages.dart';
+import 'package:proj_comp_movel/pages.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -8,7 +8,6 @@ class Dashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(pages[0].title),),
-      body: Text(pages[0].title),
     );
   }
 }
