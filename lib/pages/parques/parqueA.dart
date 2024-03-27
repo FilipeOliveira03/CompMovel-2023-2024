@@ -11,7 +11,7 @@ class ParqueA extends StatelessWidget {
     var barra = Divider(
       height: 20, // Altura da barra
       thickness: 2, // Espessura da barra
-      color: Colors.black, // Cor da barra
+      color: Colors.grey, // Cor da barra
       indent: 20, // Espaço à esquerda da barra
       endIndent: 20, // Espaço à direita da barra
     );
