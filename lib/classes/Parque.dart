@@ -1,20 +1,30 @@
+import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
 
-enum TIPOPARQUE{
-  ESTRUTURA,
-  SUPERFICIE,
+enum TIPOPARQUE {
+  Estrutura,
+  Superficie,
 }
 
-class Parque{
+enum DISPONIBILIDADE{
+  Disponivel,
+  Parcialmente_Lotado,
+  Lotado
+}
 
+class Parque {
   String nome;
+  DISPONIBILIDADE disponibilidade;
   int lotAtual = 0;
   int lotMaxima;
   TIPOPARQUE tipoParque;
-  DateTime horarioFuncionamento;
+  TimeOfDay horarioAbertura;
+  TimeOfDay horarioFecho;
   String morada;
+  double preco;
   List<Incidente> incidentes = [];
 
-  Parque(this.nome, this.tipoParque, this.lotMaxima , this.horarioFuncionamento, this.morada);
+  Parque(this.nome, this.disponibilidade ,this.tipoParque, this.lotMaxima, this.horarioAbertura,
+      this.horarioFecho, this.morada, this.preco);
 
 }
