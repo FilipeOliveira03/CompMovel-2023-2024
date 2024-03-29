@@ -1,10 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:proj_comp_movel/classes/Incidente.dart';
 
 import '../../classes/Parque.dart';
 import '../../pages.dart';
 
 class ParqueA extends StatelessWidget {
-  const ParqueA({super.key});
+  const ParqueA({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,13 @@ class ParqueA extends StatelessWidget {
         "Rua do Parque A",
         1.30);
 
+    var incidente = Incidente(DateTime(2024, 3, 29), TimeOfDay(hour: 8, minute: 00), "Buraco no chão", 4);
+
+    parque.incidentes.add(incidente);
+    parque.incidentes.add(incidente);
+    parque.incidentes.add(incidente);
+    parque.incidentes.add(incidente);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(parque.nome),
@@ -37,83 +46,98 @@ class ParqueA extends StatelessWidget {
           fontSize: 18,
           color: Colors.black,
         ),
-        child: Center(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 25,
-              ),
-              Container(
-                width: 350,
-                height: 250,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 1.2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/parqueA.jpg',
-                  width: 300,
-                  height: 300,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(
-                height: 35,
-              ),
-              Text('Lotação: ${parque.disponibilidade.name}'),
-              barra,
-              Text('Lotação: ${parque.lotAtual}/${parque.lotMaxima}'),
-              barra,
-              Text(
-                  'Horario: ${parque.horarioAbertura.hour}:${parque.horarioAbertura.minute.toString().padLeft(2, '0')} - ${parque.horarioFecho.hour}:${parque.horarioFecho.minute.toString().padLeft(2, '0')}'),
-              barra,
-              Text('Preço p/hora: ${parque.preco}€'),
-              barra,
-              Text('Tipo de Parque: ${parque.tipoParque.name}'),
-              barra,
-              Text('Morada: ${parque.morada}'),
-              SizedBox(
-                height: 35,
-              ),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                        ),
-                        child: Text(
-                          'Encontrar no mapa',
-                          style: TextStyle(color: Colors.black),
-                        )),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              height: 360,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20),
+                  Container(
+                    width: 200,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 1.2,
                       ),
-                      child: Text('Reportar Incidente',
-                          style: TextStyle(color: Colors.black)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                    child: Image.asset(
+                      'assets/parqueA.jpg',
+                      width: 300,
+                      height: 300,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  barra,
+                  Text('Lotação: ${parque.disponibilidade.name}'),
+                  Text('Lotação: ${parque.lotAtual}/${parque.lotMaxima}'),
+                  Text('Horario: ${parque.horarioAbertura.hour}:${parque.horarioAbertura.minute.toString().padLeft(2, '0')} - ${parque.horarioFecho.hour}:${parque.horarioFecho.minute.toString().padLeft(2, '0')}'),
+                  Text('Preço p/hora: ${parque.preco}€'),
+                  Text('Tipo de Parque: ${parque.tipoParque.name}'),
+                  Text('Morada: ${parque.morada}'),
+
+                ],
               ),
-            ],
-          ),
+            ),
+            barra,
+            Container(
+              height: 190,
+              child: ListView.builder(
+                physics: ClampingScrollPhysics(),
+                itemCount: parque.incidentes.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: ListTile(
+                      onTap: () {},
+                      title: Text(parque.incidentes[index].descricao),
+                    ),
+                  );
+                },
+              ),
+            ),
+            barra,
+            // Parte 3: Botões
+            Container(
+              padding: EdgeInsets.all(5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),
+                    child: Text(
+                      'Encontrar no mapa',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),
+                    child: Text(
+                      'Reportar Incidente',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
