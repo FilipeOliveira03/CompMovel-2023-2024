@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 class Incidente{
 
-  TimeOfDay hora;
+  String titulo;
   DateTime data;
-  String descricao;
+  String descricaoDetalhada;
   int gravidade;
   late Image imagem;
 
-  Incidente(this.data, this.hora, this.descricao, this.gravidade);
+  Incidente(this.titulo ,this.data, this.descricaoDetalhada, this.gravidade);
 }

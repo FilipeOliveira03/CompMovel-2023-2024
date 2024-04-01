@@ -9,6 +9,12 @@ class Mapa extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(pages[2].title),),
+      body: Image.asset(
+        'assets/maps.png',
+        width: 600,
+        height: 600,
+        fit: BoxFit.cover,
+      ),
     );
   }
 }
