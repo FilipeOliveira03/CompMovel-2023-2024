@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'Parque.dart';
 
-class ListParques{
-
-  String zona;
+class ListParques {
   List<Parque> parques = [
     Parque(
       "Parque A",
@@ -28,7 +26,7 @@ class ListParques{
       TimeOfDay(hour: 18, minute: 0),
       'Morada do Parque B',
       3.0,
-      'assert_imagem_b.jpg',
+      'assets/parqueB.jpg',
     ),
     Parque(
       "Parque C",
@@ -42,8 +40,7 @@ class ListParques{
       1.30,
       'assets/parqueC.jpg',
     ),
-
   ];
 
-  ListParques(this.zona);
+  ListParques();
 }

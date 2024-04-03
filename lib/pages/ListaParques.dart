@@ -4,13 +4,19 @@ import 'package:proj_comp_movel/classes/ListParques.dart';
 import '../classes/Parque.dart';
 import '../pages.dart';
 
-class ListaParques extends StatelessWidget {
-  final ListParques listaParques;
-
-  const ListaParques({Key? key, required this.listaParques}) : super(key: key);
+class ListaParques extends StatefulWidget {
+  const ListaParques({super.key});
 
   @override
+  State<ListaParques> createState() => _ListaParquesState();
+}
+
+class _ListaParquesState extends State<ListaParques> {
+  @override
   Widget build(BuildContext context) {
+
+    var listaParques = minhaListaParques;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista de Parques'),
@@ -18,7 +24,7 @@ class ListaParques extends StatelessWidget {
       body: ListView.builder(
         itemCount: listaParques.parques.length,
         itemBuilder: (context, index) {
-          Parque parque = listaParques.parques[index];
+          Parque? parque = listaParques.parques[index];
           return Card(
             margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: ListTile(
