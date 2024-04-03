@@ -8,7 +8,7 @@ import 'pages/ListaParques.dart';
 import 'pages/Mapa.dart';
 import 'pages/RegistoIncidentes.dart';
 
-final ListParques minhaListaParques = ListParques('Teste');
+final ListParques minhaListaParques = ListParques('exemplo');
 
 final pages = [
   (title: 'Home', icon: Icons.home, widget: Dashboard()),
