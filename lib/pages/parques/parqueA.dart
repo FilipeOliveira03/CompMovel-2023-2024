@@ -33,6 +33,7 @@ class ParqueA extends StatelessWidget {
     );
 
     var incidente1 = Incidente(
+        "Parque A",
         "Buraco no chão",
         DateTime(2024, 3, 29, 8, 00),
         "Existe um buraco no chão enorme perto da zona de pagamento",
@@ -41,6 +42,7 @@ class ParqueA extends StatelessWidget {
     );
 
     var incidente2 = Incidente(
+        "Parque A",
         "Buraco no chão 2",
         DateTime(2024, 3, 29, 8, 00),
         "Existe um buraco no chão enorme perto da zona de pagamento",
@@ -146,7 +148,7 @@ class ParqueA extends StatelessWidget {
                                       child: Column(
                                         children: [
                                           Text(
-                                            parque.incidentes[index].tituloCurto,
+                                            parque.incidentes[index].nomeParque,
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 26,
@@ -239,7 +241,7 @@ class ParqueA extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                parque.incidentes[index].tituloCurto,
+                                parque.incidentes[index].nomeParque,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
