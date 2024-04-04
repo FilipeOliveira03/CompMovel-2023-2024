@@ -54,9 +54,9 @@ class DetalheParque extends StatelessWidget {
       case DISPONIBILIDADE.PARCIALMENTE_LOTADO:
         corDisponibilidade = Colors.amber;
       case DISPONIBILIDADE.QUASE_LOTADO:
-        corDisponibilidade = Colors.purple;
+        corDisponibilidade = Colors.redAccent;
       case DISPONIBILIDADE.LOTADO:
-        corDisponibilidade = Colors.red;
+        corDisponibilidade = Colors.red.shade900;
     }
 
     Color preto = Colors.black;

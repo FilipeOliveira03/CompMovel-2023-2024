@@ -32,7 +32,7 @@ extension DISPONIBILIDADEExtension on DISPONIBILIDADE {
       case DISPONIBILIDADE.PARCIALMENTE_LOTADO:
         return 'Parcialmente Lotado';
       case DISPONIBILIDADE.QUASE_LOTADO:
-        return 'Parcialmente Lotado';
+        return 'Quase Lotado';
       case DISPONIBILIDADE.LOTADO:
         return 'Lotado';
     }
