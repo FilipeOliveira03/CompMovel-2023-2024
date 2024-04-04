@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/classes/ListParques.dart';
+import 'package:proj_comp_movel/pages/DetalheParque.dart';
 
 import '../classes/Parque.dart';
 import '../pages.dart';
@@ -39,7 +40,7 @@ class _ListaParquesState extends State<ListaParques> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => pageParque[0].widget),
+                  MaterialPageRoute(builder: (context) => DetalheParque(parque: parque)),
                 );
               },
             ),

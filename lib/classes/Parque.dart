@@ -20,6 +20,7 @@ extension TIPOPARQUEExtension on TIPOPARQUE {
 enum DISPONIBILIDADE{
   DISPONIVEL,
   PARCIALMENTE_LOTADO,
+  QUASE_LOTADO,
   LOTADO
 }
 
@@ -29,6 +30,8 @@ extension DISPONIBILIDADEExtension on DISPONIBILIDADE {
       case DISPONIBILIDADE.DISPONIVEL:
         return 'Disponível';
       case DISPONIBILIDADE.PARCIALMENTE_LOTADO:
+        return 'Parcialmente Lotado';
+      case DISPONIBILIDADE.QUASE_LOTADO:
         return 'Parcialmente Lotado';
       case DISPONIBILIDADE.LOTADO:
         return 'Lotado';
@@ -46,7 +49,7 @@ class Parque {
   TimeOfDay horarioFecho;
   String morada;
   double preco;
-  String assertImagem;
+  String? assertImagem;
   List<Incidente> incidentes = [];
 
   Parque(this.nome, this.disponibilidade ,this.tipoParque, this.lotAtual ,this.lotMaxima, this.horarioAbertura,
