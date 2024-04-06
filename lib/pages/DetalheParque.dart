@@ -73,9 +73,9 @@ class DetalheParque extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            informacaoParque(parque, barra, corDisponibilidade, preto),
+            informacaoParque(parque: parque, barra: barra, corDisponibilidade: corDisponibilidade, preto: preto),
             barra,
-            incidentesReportados(parque),
+            incidentesReportados(parque: parque),
             barra,
             butoesBaixo(),
           ],
@@ -84,10 +84,26 @@ class DetalheParque extends StatelessWidget {
     );
   }
 
-  Container informacaoParque(
-      Parque parque, Divider barra, Color corDisponibilidade, Color preto) {
+}
+
+class informacaoParque extends StatelessWidget {
+  const informacaoParque({
+    super.key,
+    required this.parque,
+    required this.barra,
+    required this.corDisponibilidade,
+    required this.preto,
+  });
+
+  final Parque parque;
+  final Divider barra;
+  final Color corDisponibilidade;
+  final Color preto;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: 360,
+      height: 380,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -125,34 +141,161 @@ class DetalheParque extends StatelessWidget {
           ),
           SizedBox(height: 10),
           barra,
-          textoInformacoes('Disponibilidade: ', parque.disponibilidade.string,
-              corDisponibilidade),
-          textoInformacoes(
-              'Lotação: ', '${parque.lotAtual}/${parque.lotMaxima}', preto),
-          textoInformacoes(
-              'Horário: ',
-              '${parque.horarioAbertura.hour}:${parque.horarioAbertura.minute.toString().padLeft(2, '0')} - ${parque.horarioFecho.hour}:${parque.horarioFecho.minute.toString().padLeft(2, '0')}',
-              preto),
-          textoInformacoes(
-              'Preço p/hora: ', '${parque.preco.toStringAsFixed(2)}€', preto),
-          textoInformacoes('Tipo de Parque: ', parque.tipoParque.string, preto),
-          textoInformacoes('Morada: ', parque.morada, preto),
+
+          textoDistancia(parque: parque),
+          textoInformacoes(textoNegrito: 'Disponibilidade: ', textoNormal: parque.disponibilidade.string, cor: corDisponibilidade),
+          textoInformacoes(textoNegrito: 'Lotação: ', textoNormal: '${parque.lotAtual}/${parque.lotMaxima}', cor: preto),
+          textoInformacoes(textoNegrito: 'Horário: ', textoNormal: '${parque.horarioAbertura.hour}:${parque.horarioAbertura.minute.toString().padLeft(2, '0')} - ${parque.horarioFecho.hour}:${parque.horarioFecho.minute.toString().padLeft(2, '0')}', cor: preto),
+          textoInformacoes(textoNegrito: 'Preço p/hora: ', textoNormal: '${parque.preco.toStringAsFixed(2)}€', cor: preto),
+          textoInformacoes(textoNegrito: 'Tipo de Parque: ', textoNormal: parque.tipoParque.string, cor: preto),
+          textoInformacoes(textoNegrito: 'Morada: ', textoNormal: parque.morada, cor: preto),
         ],
       ),
     );
   }
+}
 
-  Container incidentesReportados(Parque parque) {
+class textoDistancia extends StatelessWidget {
+  const textoDistancia({
+    super.key,
+    required this.parque,
+  });
+
+  final Parque parque;
+
+  @override
+  Widget build(BuildContext context) {
+
+    var textoDistancia = '';
+
+
+    if(parque.distancia.toString().length > 3){
+      textoDistancia = '${parque.distancia ~/ 1000}.${(parque.distancia ~/ 100) % 10} km ';
+    }else{
+      textoDistancia = '${parque.distancia} m ';
+    }
+
+    return RichText(text: TextSpan(
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      children: <TextSpan>[
+        TextSpan(
+          text: 'Parque a ',
+
+        ),
+        TextSpan(
+            text: textoDistancia,
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+            color: Colors.green
+          ),
+        ),
+        TextSpan(
+          text: 'de si',
+        ),
+      ],
+    ));
+  }
+}
+
+class textoInformacoes extends StatelessWidget {
+  const textoInformacoes({
+    super.key,
+    required this.textoNegrito,
+    required this.textoNormal,
+    required this.cor,
+  });
+
+  final String textoNegrito;
+  final String textoNormal;
+  final Color cor;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.black,
+          fontWeight: FontWeight.normal,
+        ),
+        children: <TextSpan>[
+          TextSpan(
+            text: textoNegrito,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+              text: textoNormal,
+              style: TextStyle(
+                color: cor,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class butoesBaixo extends StatelessWidget {
+  const butoesBaixo({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          OutlinedButton(
+            onPressed: () {},
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.blue,
+            ),
+            child: Text(
+              'Encontrar no mapa',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () {},
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Colors.blue,
+            ),
+            child: Text(
+              'Reportar Incidente',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class incidentesReportados extends StatelessWidget {
+  const incidentesReportados({
+    super.key,
+    required this.parque,
+  });
+
+  final Parque parque;
+
+  @override
+  Widget build(BuildContext context) {
     if (parque.incidentes.isEmpty) {
       return Container(
-          height: 190,
+          height: 170,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [Text('Não foram reportados incidentes')],
           ));
     }
     return Container(
-      height: 190,
+      height: 170,
       child: ListView.builder(
         physics: ClampingScrollPhysics(),
         itemCount: parque.incidentes.length,
@@ -297,61 +440,6 @@ class DetalheParque extends StatelessWidget {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Container butoesBaixo() {
-    return Container(
-      padding: EdgeInsets.all(5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          OutlinedButton(
-            onPressed: () {},
-            style: OutlinedButton.styleFrom(
-              backgroundColor: Colors.blue,
-            ),
-            child: Text(
-              'Encontrar no mapa',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          OutlinedButton(
-            onPressed: () {},
-            style: OutlinedButton.styleFrom(
-              backgroundColor: Colors.blue,
-            ),
-            child: Text(
-              'Reportar Incidente',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  RichText textoInformacoes(
-      String textoNegrito, String textoNormal, Color corDisponibilidade) {
-    return RichText(
-      text: TextSpan(
-        style: TextStyle(
-          fontSize: 18,
-          color: Colors.black,
-          fontWeight: FontWeight.normal,
-        ),
-        children: <TextSpan>[
-          TextSpan(
-            text: textoNegrito,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          TextSpan(
-              text: textoNormal,
-              style: TextStyle(
-                color: corDisponibilidade,
-              )),
-        ],
       ),
     );
   }

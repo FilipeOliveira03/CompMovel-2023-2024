@@ -44,6 +44,7 @@ class Parque {
   DISPONIBILIDADE disponibilidade;
   int lotAtual;
   int lotMaxima;
+  int distancia;
   TIPOPARQUE tipoParque;
   TimeOfDay horarioAbertura;
   TimeOfDay horarioFecho;
@@ -52,7 +53,7 @@ class Parque {
   String? assertImagem;
   List<Incidente> incidentes = [];
 
-  Parque(this.nome, this.disponibilidade ,this.tipoParque, this.lotAtual ,this.lotMaxima, this.horarioAbertura,
+  Parque(this.nome, this.disponibilidade ,this.tipoParque, this.lotAtual ,this.lotMaxima, this.distancia ,this.horarioAbertura,
       this.horarioFecho, this.morada, this.preco, this.assertImagem);
 
 }
