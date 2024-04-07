@@ -11,13 +11,6 @@ class Dashboard extends StatelessWidget {
 
   var parques = minhaListaParques.parques;
 
-  List<Parque> filterParques(String query) {
-    // Filtrar os parques com base na query
-    return minhaListaParques.parques.where((parque) {
-      return parque.nome.toLowerCase().contains(query.toLowerCase());
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,20 +18,156 @@ class Dashboard extends StatelessWidget {
         title: Text(pages[0].title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(height: 15,),
-            SearchBarApp(),
-            Text('map'),
-            Text('3 parques proximos'),
-          ]
-        ),
+        child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+          SizedBox(height: 15,),
+          SearchBarApp(),
+          SizedBox(height: 15,),
+          textoInfoWidget(texto1: 'Parques próximos', texto2: 'Ver todos'),
+          SizedBox(height: 15,),
+          miniMapaWidget(),
+          SizedBox(height: 15,),
+          SizedBox(
+            height: 250,
+            width: 400,
+            child: ListView.builder(
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                var lista = minhaListaParques;
+                lista.parques.sort((a, b) => a.distancia.compareTo(b.distancia));
+                Parque parque = lista.parques[index];
+
+                return GestureDetector(
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DetalheParque(parque: parque)),
+                    );
+                  },
+                  child: Container(
+                      margin: EdgeInsets.only(bottom: 10, right: 15, left: 15),
+                    child: Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  textoParqProx(parque.nome, 18, Colors.black, FontWeight.bold),
+                                  textoParqProx(parque.distancia.toString(), 20, Colors.black, FontWeight.bold),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  textoParqProx('${parque.preco.toStringAsFixed(2)}€/hr', 14, Colors.black54, FontWeight.normal),
+                                  textoParqProx('${parque.lotMaxima - parque.lotAtual} Lugares Vazios!', 14, Colors.green, FontWeight.bold),
+                                  textoParqProx('km de si', 14, Colors.black54, FontWeight.normal),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                    ),
+                  )
+                );
+              },
+            ),
+          )
+        ]),
+      ),
+    );
+  }
+
+  Text textoParqProx(String label, double? tamanho, Color cor, FontWeight font) {
+    return Text(
+      label,
+      style:TextStyle(
+        fontSize: tamanho,
+        color: cor,
+        fontWeight: font,
       ),
     );
   }
 }
 
+class miniMapaWidget extends StatelessWidget {
+  const miniMapaWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            'assets/maps_aumentado.png',
+            fit: BoxFit.cover,
+            height: 190,
+            width: 360,
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                width: 1,
+                color: Colors.black.withOpacity(0.3),
+                style: BorderStyle.solid,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class textoInfoWidget extends StatelessWidget {
+  const textoInfoWidget({
+    super.key,
+    required this.texto1,
+    required this.texto2,
+  });
+
+  final String texto1;
+  final String texto2;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                texto1,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  //falta aqui fazer qualquer coisa que não sei
+                },
+                child: Text(
+                  texto2,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+  }
+}
 
 class SearchBarApp extends StatefulWidget {
   const SearchBarApp({super.key});
@@ -85,7 +214,8 @@ class _SearchBarAppState extends State<SearchBarApp> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DetalheParque(parque: parque)),
+                MaterialPageRoute(
+                    builder: (context) => DetalheParque(parque: parque)),
               );
               mudaHistorico(parque);
             },
@@ -104,28 +234,28 @@ class _SearchBarAppState extends State<SearchBarApp> {
 
   @override
   Widget build(BuildContext context) {
-
     return SizedBox(
-        height: 40,
-        width: 370,
+        height: 45,
+        width: 365,
         child: SearchAnchor.bar(
           barHintText: 'Procura parques',
-          onSubmitted: (String value){
-
+          onSubmitted: (String value) {
             bool existe = false;
             var parqueEncontrado;
 
-            for(var i = 0; i < minhaListaParques.parques.length; i++){
-              if(minhaListaParques.parques[i].nome == value){
+            for (var i = 0; i < minhaListaParques.parques.length; i++) {
+              if (minhaListaParques.parques[i].nome == value) {
                 existe = true;
                 parqueEncontrado = minhaListaParques.parques[i];
               }
             }
 
-            if(existe){
+            if (existe) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DetalheParque(parque: parqueEncontrado)),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        DetalheParque(parque: parqueEncontrado)),
               );
             }
           },
@@ -138,16 +268,19 @@ class _SearchBarAppState extends State<SearchBarApp> {
               return <Widget>[
                 Center(
                     child: Column(
-                      children: [
-                        SizedBox(height: 5,),
-                        Text('Não têm pesquisas recentes',)
-                      ],
-                    ))
+                  children: [
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'Não têm pesquisas recentes',
+                    )
+                  ],
+                ))
               ];
             }
             return getSugestoes(controller);
           },
-        )
-    ) ;
+        ));
   }
 }

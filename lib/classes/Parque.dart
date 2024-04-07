@@ -39,6 +39,7 @@ extension DISPONIBILIDADEExtension on DISPONIBILIDADE {
   }
 }
 
+
 class Parque {
   String nome;
   DISPONIBILIDADE disponibilidade;

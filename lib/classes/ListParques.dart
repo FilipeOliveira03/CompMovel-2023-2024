@@ -22,7 +22,7 @@ class ListParques {
       DISPONIBILIDADE.DISPONIVEL,
       TIPOPARQUE.SUPERFICIE,
       33,
-      3330,
+      330,
       20,
       TimeOfDay(hour: 9, minute: 0),
       TimeOfDay(hour: 21, minute: 0),
