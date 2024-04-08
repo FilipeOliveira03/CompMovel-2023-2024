@@ -13,3 +13,10 @@ class Incidente{
 
   Incidente(this.nomeParque, this.tituloCurto ,this.data, this.descricaoDetalhada, this.gravidade, this.assertImagem);
 }
+
+class ListaIncidente {
+
+  static List<Incidente> incidentes = [];
+
+  ListaIncidente();
+}

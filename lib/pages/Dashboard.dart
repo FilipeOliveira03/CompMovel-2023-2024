@@ -1,84 +1,156 @@
 import 'package:flutter/material.dart';
+import 'package:marquee/marquee.dart';
+import 'package:proj_comp_movel/classes/Incidente.dart';
 import 'package:proj_comp_movel/pages.dart';
 
 import '../classes/Parque.dart';
+import '../main.dart';
 import 'DetalheParque.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});
 
-  TextEditingController textEditingController = TextEditingController();
-
-  var parques = minhaListaParques.parques;
+  String textoLabel(Incidente incidente){
+    return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, ás ${incidente.data.hour}:${incidente.data.minute}!';
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    var listaIncidentesTotais = ListaIncidente.incidentes.toList();
+
+  /*
+    listaIncidentesTotais.add(Incidente("Parque A", "Incidente 1", DateTime(2022, 4, 3, 10, 30), "Descrição do incidente 1", 3, null));
+    listaIncidentesTotais.add(Incidente("Parque B", "Incidente 1", DateTime(2022, 4, 6, 11, 30), "Descrição do incidente 1", 3, null));
+    listaIncidentesTotais.add(Incidente("Parque C", "Incidente 1", DateTime(2022, 4, 3, 9, 30), "Descrição do incidente 1", 3, null));
+    listaIncidentesTotais.add(Incidente("Parque D", "Incidente 1", DateTime(2022, 4, 6, 10, 30), "Descrição do incidente 1", 3, null));
+    listaIncidentesTotais.add(Incidente("Parque E", "Incidente 1", DateTime(2022, 4, 5, 12, 30), "Descrição do incidente 1", 3, null));
+    listaIncidentesTotais.add(Incidente("Parque F", "Incidente 1", DateTime(2022, 4, 3, 6, 30), "Descrição do incidente 1", 3, null));
+  */
+
+    listaIncidentesTotais.sort((a, b) => b.data.compareTo(a.data));
+
+    var incidente;
+    if (listaIncidentesTotais.isEmpty){
+      incidente = '       Não foram reportados incidentes recentemente!';
+    }else{
+      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
+    }
+
+    print(incidente);
+
+    var barra = Divider(
+      height: 20,
+      thickness: 2,
+      color: Colors.grey,
+      indent: 15,
+      endIndent: 15,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(pages[0].title),
       ),
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          SizedBox(height: 15,),
-          SizedBox(height: 15,),
-          textoInfoWidget(texto1: 'Parques próximos', texto2: 'Ver todos'),
-          SizedBox(height: 15,),
-          miniMapaWidget(),
-          SizedBox(height: 15,),
+          SizedBox(height: 10,),
+          barra,
           SizedBox(
-            height: 250,
-            width: 400,
-            child: ListView.builder(
-              itemCount: 3,
-              itemBuilder: (context, index) {
-                var lista = minhaListaParques;
-                lista.parques.sort((a, b) => a.distancia.compareTo(b.distancia));
-                Parque parque = lista.parques[index];
-
-                return GestureDetector(
-                  onTap: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DetalheParque(parque: parque)),
-                    );
-                  },
-                  child: Container(
-                      margin: EdgeInsets.only(bottom: 10, right: 15, left: 15),
-                    child: Card(
-                        child: Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  textoParqProx(parque.nome, 18, Colors.black, FontWeight.bold),
-                                  textoParqProx(parque.distancia.toString(), 20, Colors.black, FontWeight.bold),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  textoParqProx('${parque.preco.toStringAsFixed(2)}€/hr', 14, Colors.black54, FontWeight.normal),
-                                  textoParqProx('${parque.lotMaxima - parque.lotAtual} Lugares Vazios!', 14, Colors.green, FontWeight.bold),
-                                  textoParqProx('m de si', 14, Colors.black54, FontWeight.normal),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                    ),
-                  )
-                );
-              },
+            height: 30,
+            width: 365,
+            child: Marquee(
+              text: incidente,
+              style: TextStyle(
+                fontSize: 18,
+              ),
+              velocity: 40,
             ),
-          )
+          ),
+          barra,
+          textoInfoWidget(texto1: 'Parques próximos'),
+          SizedBox(height: 10,),
+          miniMapaWidget(),
+          SizedBox(height: 10,),
+          tresParquesProxWidget()
         ]),
       ),
     );
   }
+}
 
-  Text textoParqProx(String label, double? tamanho, Color cor, FontWeight font) {
+class tresParquesProxWidget extends StatelessWidget {
+  const tresParquesProxWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 250,
+      width: 400,
+      child: ListView.builder(
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          var lista = List<Parque>.from(minhaListaParques.parques);
+          lista.sort((a, b) => a.distancia.compareTo(b.distancia));
+          Parque parque = lista[index];
+          return GestureDetector(
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DetalheParque(parque: parque)),
+              );
+            },
+            child: Container(
+                margin: EdgeInsets.only(bottom: 10, right: 15, left: 15),
+              child: Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            textoParqProx(label: parque.nome, tamanho: 18, cor: Colors.black, font: FontWeight.bold),
+                            textoParqProx(label: parque.distancia.toString(), tamanho: 20, cor: Colors.black, font: FontWeight.bold),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            textoParqProx(label: '${parque.preco.toStringAsFixed(2)}€/hr', tamanho: 14, cor: Colors.black54, font: FontWeight.normal),
+                            textoParqProx(label: '${parque.lotMaxima - parque.lotAtual} Lugares Vazios!', tamanho: 14, cor: Colors.green, font: FontWeight.bold),
+                            textoParqProx(label: 'm de si', tamanho: 14, cor: Colors.black54, font: FontWeight.normal),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+              ),
+            )
+          );
+        },
+      ),
+    );
+  }
+}
+
+class textoParqProx extends StatelessWidget {
+  const textoParqProx({
+    super.key,
+    required this.label,
+    required this.tamanho,
+    required this.cor,
+    required this.font,
+  });
+
+  final String label;
+  final double? tamanho;
+  final Color cor;
+  final FontWeight font;
+
+  @override
+  Widget build(BuildContext context) {
     return Text(
       label,
       style:TextStyle(
@@ -129,18 +201,16 @@ class textoInfoWidget extends StatelessWidget {
   const textoInfoWidget({
     super.key,
     required this.texto1,
-    required this.texto2,
   });
 
   final String texto1;
-  final String texto2;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 texto1,
@@ -150,26 +220,11 @@ class textoInfoWidget extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => pages[1].widget),
-                  );
-                },
-                child: Text(
-                  texto2,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.blue,
-                  ),
-                ),
-              ),
             ],
           ),
         );
   }
 }
+
 
 

@@ -27,9 +27,16 @@ class _ListaParquesState extends State<ListaParques> {
           children: [
             SizedBox(height: 15,),
             SearchBarApp(),
-            SizedBox(height: 15,),
+            SizedBox(height: 5,),
+            Divider(
+              height: 20,
+              thickness: 2,
+              color: Colors.grey,
+              indent: 20,
+              endIndent: 20,
+            ),
             Container(
-              height: 500,
+              height: 490,
               width: 500,
               child: ListView.builder(
                 itemCount: listaParques.parques.length,

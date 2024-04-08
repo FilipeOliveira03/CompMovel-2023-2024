@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'classes/Incidente.dart';
 import 'classes/ListParques.dart';
 import 'pages/Dashboard.dart';
 import 'pages/ListaParques.dart';
