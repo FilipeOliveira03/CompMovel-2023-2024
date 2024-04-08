@@ -20,7 +20,6 @@ class Dashboard extends StatelessWidget {
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
           SizedBox(height: 15,),
-          SearchBarApp(),
           SizedBox(height: 15,),
           textoInfoWidget(texto1: 'Parques próximos', texto2: 'Ver todos'),
           SizedBox(height: 15,),
@@ -62,7 +61,7 @@ class Dashboard extends StatelessWidget {
                                 children: [
                                   textoParqProx('${parque.preco.toStringAsFixed(2)}€/hr', 14, Colors.black54, FontWeight.normal),
                                   textoParqProx('${parque.lotMaxima - parque.lotAtual} Lugares Vazios!', 14, Colors.green, FontWeight.bold),
-                                  textoParqProx('km de si', 14, Colors.black54, FontWeight.normal),
+                                  textoParqProx('m de si', 14, Colors.black54, FontWeight.normal),
                                 ],
                               ),
                             ],
@@ -153,7 +152,11 @@ class textoInfoWidget extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  //falta aqui fazer qualquer coisa que não sei
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => pages[1].widget),
+                  );
                 },
                 child: Text(
                   texto2,
@@ -169,118 +172,4 @@ class textoInfoWidget extends StatelessWidget {
   }
 }
 
-class SearchBarApp extends StatefulWidget {
-  const SearchBarApp({super.key});
 
-  @override
-  State<SearchBarApp> createState() => _SearchBarAppState();
-}
-
-class _SearchBarAppState extends State<SearchBarApp> {
-  List<Parque> historico = <Parque>[];
-
-  Iterable<Widget> getListaHistorico(SearchController controller) {
-    return historico.map(
-      (Parque parque) => ListTile(
-        leading: const Icon(Icons.history),
-        title: Text(parque.nome),
-        trailing: IconButton(
-          icon: const Icon(Icons.call_missed),
-          onPressed: () {
-            controller.text = parque.nome;
-            controller.selection =
-                TextSelection.collapsed(offset: controller.text.length);
-          },
-        ),
-      ),
-    );
-  }
-
-  Iterable<Widget> getSugestoes(SearchController controller) {
-    final String input = controller.value.text;
-    return minhaListaParques.parques
-        .where((Parque parque) => parque.nome.contains(input))
-        .map(
-          (Parque parque) => ListTile(
-            title: Text(parque.nome),
-            trailing: IconButton(
-              icon: const Icon(Icons.call_missed),
-              onPressed: () {
-                controller.text = parque.nome;
-                controller.selection =
-                    TextSelection.collapsed(offset: controller.text.length);
-              },
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DetalheParque(parque: parque)),
-              );
-              mudaHistorico(parque);
-            },
-          ),
-        );
-  }
-
-  void mudaHistorico(Parque parque) {
-    setState(() {
-      if (historico.length >= 5) {
-        historico.removeLast();
-      }
-      historico.insert(0, parque);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        height: 45,
-        width: 365,
-        child: SearchAnchor.bar(
-          barHintText: 'Procura parques',
-          onSubmitted: (String value) {
-            bool existe = false;
-            var parqueEncontrado;
-
-            for (var i = 0; i < minhaListaParques.parques.length; i++) {
-              if (minhaListaParques.parques[i].nome == value) {
-                existe = true;
-                parqueEncontrado = minhaListaParques.parques[i];
-              }
-            }
-
-            if (existe) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        DetalheParque(parque: parqueEncontrado)),
-              );
-            }
-          },
-          suggestionsBuilder:
-              (BuildContext context, SearchController controller) {
-            if (controller.text.isEmpty) {
-              if (historico.isNotEmpty) {
-                return getListaHistorico(controller);
-              }
-              return <Widget>[
-                Center(
-                    child: Column(
-                  children: [
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      'Não têm pesquisas recentes',
-                    )
-                  ],
-                ))
-              ];
-            }
-            return getSugestoes(controller);
-          },
-        ));
-  }
-}
