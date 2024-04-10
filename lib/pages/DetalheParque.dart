@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
+import 'package:proj_comp_movel/pages/Mapa.dart';
+import 'package:proj_comp_movel/pages/RegistoIncidentes.dart';
 
 import '../classes/Parque.dart';
 import '../pages.dart';
@@ -251,7 +253,9 @@ class butoesBaixo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>Mapa()));
+              },
             style: OutlinedButton.styleFrom(
               backgroundColor: Colors.blue,
             ),
@@ -261,7 +265,9 @@ class butoesBaixo extends StatelessWidget {
             ),
           ),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>RegistoIncidentes()));
+            },
             style: OutlinedButton.styleFrom(
               backgroundColor: Colors.blue,
             ),
