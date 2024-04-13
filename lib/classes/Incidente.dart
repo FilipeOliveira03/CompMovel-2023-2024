@@ -16,7 +16,7 @@ class Incidente{
 
 class ListaIncidente {
 
-  static List<Incidente> incidentes = [];
+  List<Incidente> incidentes = [];
 
   ListaIncidente();
 }

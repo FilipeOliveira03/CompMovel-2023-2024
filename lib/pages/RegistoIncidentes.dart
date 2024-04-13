@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 import '../classes/Incidente.dart';
 import '../classes/Parque.dart';
@@ -13,13 +14,13 @@ class RegistoIncidentes extends StatefulWidget {
 }
 
 class _IncidenteFormScreenState extends State<RegistoIncidentes> {
-  final _formKey = GlobalKey<FormState>(); // Chave global para o formulário
+  final _formKey = GlobalKey<FormState>();
 
   String? nomeParque;
   String? tituloCurto;
-  int gravidade = 1;
-  DateTime data = DateTime.now(); // vem a data atual por defeito
-  TextEditingController descricaoController = TextEditingController(); // Alteração aqui
+  double gravidade = 1;
+  DateTime data = DateTime.now();
+  TextEditingController descricaoController = TextEditingController();
   String descricaoDetalhada = '';
 
   final List<String> listaParques = [];
@@ -33,14 +34,13 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
   }
 
   void adicionarIncidenteAoParqueSelecionado(Incidente incidente) {
-    // Procurar o parque selecionado na lista de parques
     Parque? parqueSelecionado = minhaListaParques.parques.firstWhere(
           (parque) => parque.nome == nomeParque,
     );
 
     if (parqueSelecionado != null) {
-      // Adicionar o incidente à lista de incidentes do parque selecionado
       parqueSelecionado.incidentes.add(incidente);
+      minhaListaIncidentes.incidentes.add(incidente);
     }
   }
 
@@ -68,20 +68,31 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Formulário de Incidente'),
+        title: Text('Formulário de Incidentes'),
       ),
       body: Padding(
         padding: EdgeInsets.all(15.0),
         child: Form(
-          key: _formKey, // Atribuindo a chave global ao formulário
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Registe o incidente que pretende reportar:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 2.0),
+              Text(
+                'Campos com * são obrigatórios',
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+              SizedBox(height: 12.0),
               DropdownButtonFormField(
                 value: nomeParque,
                 items: listaParques.map((nomeParque) {
@@ -96,17 +107,17 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                   });
                 },
                 decoration: InputDecoration(
-                  labelText: 'Selecionar Parque *', // Adicionando asterisco
+                  labelText: 'Selecionar Parque *',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Este campo é obrigatório'; // Mensagem de erro para campo vazio
+                    return 'Este campo é obrigatório';
                   }
-                  return null; // Retorna nulo se a validação passar
+                  return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 12.0),
               TextFormField(
                 onChanged: (value) {
                   setState(() {
@@ -114,40 +125,72 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                   });
                 },
                 decoration: InputDecoration(
-                  labelText: 'Título Curto do Incidente *', // Adicionando asterisco
+                  labelText: 'Título Curto do Incidente *',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Este campo é obrigatório'; // Mensagem de erro para campo vazio
-                  }
-                  return null; // Retorna nulo se a validação passar
-                },
-              ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  setState(() {
-                    gravidade = int.tryParse(value) ?? 1;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Gravidade do Incidente (1-5) *', // Adicionando asterisco
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Este campo é obrigatório'; // Mensagem de erro para campo vazio
-                  }
-                  final gravidadeValue = int.tryParse(value);
-                  if (gravidadeValue == null || gravidadeValue < 1 || gravidadeValue > 5) {
-                    return 'A gravidade deve estar entre 1 e 5'; // Mensagem de erro para valor inválido
+                    return 'Este campo é obrigatório';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 12.0),
+              TextFormField(
+                controller: descricaoController,
+                onChanged: (value) {
+                  setState(() {
+                    descricaoDetalhada = value;
+                  });
+                },
+                maxLines: null,
+                decoration: InputDecoration(
+                  labelText: 'Descrição Detalhada',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 12.0),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black54), // Cor da borda
+                  borderRadius:
+                  BorderRadius.circular(5.0), // Borda arredondada
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: 5.0, // Padding na parte superior
+                        left: 10.0, // Padding na parte esquerda
+                        right: 10.0, // Padding na parte direita
+                      ),
+                      child: Text(
+                        'Gravidade do incidente: *',
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    SfSlider(
+                      value: gravidade,
+                      min: 1,
+                      max: 5,
+                      stepSize: 1,
+                      interval: 1,
+                      showTicks: true,
+                      showLabels: true,
+                      minorTicksPerInterval: 1,
+                      onChanged: (value){
+                        setState(() {
+                          gravidade = value;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 10,)
+                  ],
+                ),
+              ),
+              SizedBox(height: 12.0),
               DateTimeField(
                 format: DateFormat("dd/MM/yyyy HH:mm"),
                 initialValue: data,
@@ -166,7 +209,8 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                   if (date != null) {
                     final time = await showTimePicker(
                       context: context,
-                      initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                      initialTime: TimeOfDay.fromDateTime(
+                          currentValue ?? DateTime.now()),
                     );
                     return DateTimeField.combine(date, time);
                   } else {
@@ -174,53 +218,34 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                   }
                 },
                 decoration: InputDecoration(
-                  labelText: 'Data e Hora *', // Adicionando asterisco
+                  labelText: 'Data e Hora *',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null) {
-                    return 'Este campo é obrigatório'; // Mensagem de erro para campo vazio
+                    return 'Este campo é obrigatório';
                   }
-                  return null; // Retorna nulo se a validação passar
+                  return null;
                 },
               ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                controller: descricaoController, // Alteração aqui
-                onChanged: (value) {
-                  setState(() {
-                    descricaoDetalhada = value;
-                  });
-                },
-                maxLines: null,
-                decoration: InputDecoration(
-                  labelText: 'Descrição Detalhada',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 10.0),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    // Verificar se o formulário é válido antes de submeter
                     if (_formKey.currentState!.validate()) {
-                      // Criar um novo incidente com os dados do formulário
                       Incidente novoIncidente = Incidente(
                         nomeParque!,
                         tituloCurto!,
                         data,
                         descricaoDetalhada,
-                        gravidade,
-                        null, // Defina aqui a imagem do incidente, se aplicável
+                        gravidade.toInt(),
+                        null,
                       );
 
-                      // Adicionar o incidente à lista de incidentes do parque selecionado
                       adicionarIncidenteAoParqueSelecionado(novoIncidente);
 
-                      // Limpar o formulário após a submissão
                       _formKey.currentState!.reset();
 
-                      // Exibir o pop-up de sucesso
                       _exibirPopUp();
                     }
                   },

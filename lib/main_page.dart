@@ -15,12 +15,26 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: pages[_selectedIndex].widget,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) => setState(() => _selectedIndex = index),
-        destinations: pages.map((page) => NavigationDestination(icon: Icon(page.icon), label: page.title)).toList(),
+    return MaterialApp(
+      theme: ThemeData(
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: Colors.white10,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue,
+          titleTextStyle: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      home: Scaffold(
+        body: pages[_selectedIndex].widget,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+          destinations: pages.map((page) => NavigationDestination(icon: Icon(page.icon), label: page.title)).toList(),
+        ),
       ),
     );
   }

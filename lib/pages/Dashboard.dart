@@ -10,31 +10,27 @@ import 'DetalheParque.dart';
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});
 
-  String textoLabel(Incidente incidente){
+  String textoLabel(Incidente incidente) {
     return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, ás ${incidente.data.hour}:${incidente.data.minute}!';
   }
 
   @override
   Widget build(BuildContext context) {
-
-    var listaIncidentesTotais = ListaIncidente.incidentes.toList();
-
-  /*
-    listaIncidentesTotais.add(Incidente("Parque A", "Incidente 1", DateTime(2022, 4, 3, 10, 30), "Descrição do incidente 1", 3, null));
-    listaIncidentesTotais.add(Incidente("Parque B", "Incidente 1", DateTime(2022, 4, 6, 11, 30), "Descrição do incidente 1", 3, null));
-    listaIncidentesTotais.add(Incidente("Parque C", "Incidente 1", DateTime(2022, 4, 3, 9, 30), "Descrição do incidente 1", 3, null));
-    listaIncidentesTotais.add(Incidente("Parque D", "Incidente 1", DateTime(2022, 4, 6, 10, 30), "Descrição do incidente 1", 3, null));
-    listaIncidentesTotais.add(Incidente("Parque E", "Incidente 1", DateTime(2022, 4, 5, 12, 30), "Descrição do incidente 1", 3, null));
-    listaIncidentesTotais.add(Incidente("Parque F", "Incidente 1", DateTime(2022, 4, 3, 6, 30), "Descrição do incidente 1", 3, null));
-  */
+    var listaIncidentesTotais = minhaListaIncidentes.incidentes.toList();
 
     listaIncidentesTotais.sort((a, b) => b.data.compareTo(a.data));
 
     var incidente;
-    if (listaIncidentesTotais.isEmpty){
+    if (listaIncidentesTotais.isEmpty) {
       incidente = '       Não foram reportados incidentes recentemente!';
-    }else{
-      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
+    } else if (listaIncidentesTotais.length == 1) {
+      incidente = textoLabel(listaIncidentesTotais[0]);
+    } else if (listaIncidentesTotais.length == 2) {
+      incidente =
+          '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])}';
+    } else {
+      incidente =
+          '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
     }
 
     print(incidente);
@@ -53,7 +49,9 @@ class Dashboard extends StatelessWidget {
       ),
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           barra,
           SizedBox(
             height: 30,
@@ -68,9 +66,13 @@ class Dashboard extends StatelessWidget {
           ),
           barra,
           textoInfoWidget(texto1: 'Parques próximos'),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           miniMapaWidget(),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           tresParquesProxWidget()
         ]),
       ),
@@ -94,16 +96,30 @@ class tresParquesProxWidget extends StatelessWidget {
           var lista = List<Parque>.from(minhaListaParques.parques);
           lista.sort((a, b) => a.distancia.compareTo(b.distancia));
           Parque parque = lista[index];
+
+          var lotAtual = parque.lotMaxima - parque.lotAtual;
+
+          var corLotacao;
+
+          if(lotAtual == 0){
+            corLotacao = Colors.red;
+          }else if(lotAtual < (parque.lotMaxima * 0.1).toInt()){
+            corLotacao = Colors.amber;
+          } else{
+            corLotacao = Colors.green;
+          }
+
           return GestureDetector(
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetalheParque(parque: parque)),
-              );
-            },
-            child: Container(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetalheParque(parque: parque)),
+                );
+              },
+              child: Container(
                 margin: EdgeInsets.only(bottom: 10, right: 15, left: 15),
-              child: Card(
+                child: Card(
                   child: Padding(
                     padding: EdgeInsets.all(10),
                     child: Column(
@@ -111,24 +127,44 @@ class tresParquesProxWidget extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            textoParqProx(label: parque.nome, tamanho: 18, cor: Colors.black, font: FontWeight.bold),
-                            textoParqProx(label: parque.distancia.toString(), tamanho: 20, cor: Colors.black, font: FontWeight.bold),
+                            textoParqProx(
+                                label: parque.nome,
+                                tamanho: 18,
+                                cor: Colors.black,
+                                font: FontWeight.bold),
+                            textoParqProx(
+                                label: parque.distancia.toString(),
+                                tamanho: 20,
+                                cor: Colors.black,
+                                font: FontWeight.bold),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            textoParqProx(label: '${parque.preco.toStringAsFixed(2)}€/hr', tamanho: 14, cor: Colors.black54, font: FontWeight.normal),
-                            textoParqProx(label: '${parque.lotMaxima - parque.lotAtual} Lugares Vazios!', tamanho: 14, cor: Colors.green, font: FontWeight.bold),
-                            textoParqProx(label: 'm de si', tamanho: 14, cor: Colors.black54, font: FontWeight.normal),
+                            textoParqProx(
+                                label: '${parque.preco.toStringAsFixed(2)}€/hr',
+                                tamanho: 14,
+                                cor: Colors.black54,
+                                font: FontWeight.normal),
+                            textoParqProx(
+                                label:
+                                    '${parque.lotMaxima - parque.lotAtual} Lugares Vazios!',
+                                tamanho: 14,
+                                cor: corLotacao,
+                                font: FontWeight.bold),
+                            textoParqProx(
+                                label: 'm de si',
+                                tamanho: 14,
+                                cor: Colors.black54,
+                                font: FontWeight.normal),
                           ],
                         ),
                       ],
                     ),
-                  )
-              ),
-            )
-          );
+                  ),
+                ),
+              ));
         },
       ),
     );
@@ -153,7 +189,7 @@ class textoParqProx extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style:TextStyle(
+      style: TextStyle(
         fontSize: tamanho,
         color: cor,
         fontWeight: font,
@@ -208,23 +244,20 @@ class textoInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                texto1,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            texto1,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        );
+        ],
+      ),
+    );
   }
 }
-
-
-
