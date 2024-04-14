@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
@@ -15,6 +16,7 @@ class RegistoIncidentes extends StatefulWidget {
 
 class _IncidenteFormScreenState extends State<RegistoIncidentes> {
   final _formKey = GlobalKey<FormState>();
+  XFile? _imageFile; // Adicione esta variável para armazenar a imagem selecionada
 
   String? nomeParque;
   String? tituloCurto;
@@ -42,6 +44,14 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
       parqueSelecionado.incidentes.add(incidente);
       minhaListaIncidentes.incidentes.add(incidente);
     }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery); // Pode usar ImageSource.camera para tirar uma foto
+    setState(() {
+      _imageFile = pickedFile;
+    });
   }
 
   void _exibirPopUp() {
@@ -150,6 +160,25 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                 ),
               ),
               SizedBox(height: 12.0),
+              GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black54),
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt),
+                      SizedBox(width: 8.0),
+                      Text('Selecionar Imagem'),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 12.0),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black54), // Cor da borda
@@ -180,13 +209,13 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                       showTicks: true,
                       showLabels: true,
                       minorTicksPerInterval: 1,
-                      onChanged: (value){
+                      onChanged: (value) {
                         setState(() {
                           gravidade = value;
                         });
                       },
                     ),
-                    SizedBox(height: 10,)
+                    SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -239,7 +268,7 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                         data,
                         descricaoDetalhada,
                         gravidade.toInt(),
-                        null,
+                        _imageFile,
                       );
 
                       adicionarIncidenteAoParqueSelecionado(novoIncidente);

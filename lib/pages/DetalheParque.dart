@@ -353,7 +353,7 @@ class incidentesReportados extends StatelessWidget {
                               SizedBox(
                                 height: 10,
                               ),
-                              if (parque.incidentes[index].assertImagem != null)
+                              if (parque.incidentes[index].imagem != null)
                                 Container(
                                   width: 200,
                                   height: 180,
@@ -372,13 +372,13 @@ class incidentesReportados extends StatelessWidget {
                                     ],
                                   ),
                                   child: Image.asset(
-                                    '${parque.incidentes[index].assertImagem}',
+                                    '${parque.incidentes[index].imagem}',
                                     width: 150,
                                     height: 150,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                              if (parque.incidentes[index].assertImagem != null)
+                              if (parque.incidentes[index].imagem != null)
                                 SizedBox(
                                   height: 8,
                                 ),
