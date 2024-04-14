@@ -131,7 +131,7 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                     });
                   },
                   decoration: InputDecoration(
-                    labelText: 'Título Curto do Incidente *',
+                    labelText: 'Descrição Curta do Incidente *',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -257,14 +257,27 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        Incidente novoIncidente = Incidente(
-                          nomeParque!,
-                          tituloCurto!,
-                          data,
-                          descricaoDetalhada,
-                          gravidade.toInt(),
-                          _imageFile,
-                        );
+                        // Verifica se _imageFile é nulo e cria o objeto Incidente de acordo
+                        Incidente novoIncidente;
+                        if (_imageFile != null) {
+                          novoIncidente = Incidente(
+                            nomeParque!,
+                            tituloCurto!,
+                            data,
+                            descricaoDetalhada,
+                            gravidade.toInt(),
+                            _imageFile!,
+                          );
+                        } else {
+                          novoIncidente = Incidente(
+                            nomeParque!,
+                            tituloCurto!,
+                            data,
+                            descricaoDetalhada,
+                            gravidade.toInt(),
+                            null, // ou outro valor que indique que não há imagem
+                          );
+                        }
 
                         adicionarIncidenteAoParqueSelecionado(novoIncidente);
 
@@ -276,6 +289,7 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
                     child: Text('Submeter'),
                   ),
                 ),
+
               ],
             ),
           ),

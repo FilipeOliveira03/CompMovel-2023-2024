@@ -10,11 +10,10 @@ class Incidente {
   DateTime data;
   String descricaoDetalhada;
   int gravidade;
-  XFile? imagem; // Corrigido para imagem
+  XFile? imagem;
 
   Incidente(this.nomeParque, this.tituloCurto, this.data, this.descricaoDetalhada, this.gravidade, this.imagem); // Corrigido para imagem
 }
-
 
 class ListaIncidente {
 

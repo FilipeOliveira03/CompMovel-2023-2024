@@ -1,3 +1,4 @@
+import 'package:cross_file_image/cross_file_image.dart';
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
 import 'package:proj_comp_movel/pages/Mapa.dart';
@@ -380,8 +381,9 @@ class incidentesReportados extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  child: Image.asset(
-                                    '${parque.incidentes[index].imagem}',
+                                  child: Image(
+                                    image: XFileImage(
+                                        parque.incidentes[index].imagem!),
                                     width: 150,
                                     height: 150,
                                     fit: BoxFit.cover,
