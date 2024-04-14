@@ -16,7 +16,7 @@ class RegistoIncidentes extends StatefulWidget {
 
 class _IncidenteFormScreenState extends State<RegistoIncidentes> {
   final _formKey = GlobalKey<FormState>();
-  XFile? _imageFile; // Adicione esta variável para armazenar a imagem selecionada
+  XFile? _imageFile;
 
   String? nomeParque;
   String? tituloCurto;
@@ -48,7 +48,7 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery); // Pode usar ImageSource.camera para tirar uma foto
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _imageFile = pickedFile;
     });
@@ -85,203 +85,199 @@ class _IncidenteFormScreenState extends State<RegistoIncidentes> {
         title: Text('Formulário de Incidentes'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(15.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Registe o incidente que pretende reportar:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 2.0),
-              Text(
-                'Campos com * são obrigatórios',
-                style: TextStyle(
-                  color: Colors.red,
+        padding: EdgeInsets.all(10.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Campos com * são obrigatórios',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
                 ),
-              ),
-              SizedBox(height: 12.0),
-              DropdownButtonFormField(
-                value: nomeParque,
-                items: listaParques.map((nomeParque) {
-                  return DropdownMenuItem(
-                    value: nomeParque,
-                    child: Text(nomeParque),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    nomeParque = value!;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Selecionar Parque *',
-                  border: OutlineInputBorder(),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                DropdownButtonFormField(
+                  value: nomeParque,
+                  items: listaParques.map((nomeParque) {
+                    return DropdownMenuItem(
+                      value: nomeParque,
+                      child: Text(nomeParque),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      nomeParque = value!;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Selecionar Parque *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Este campo é obrigatório';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Este campo é obrigatório';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 12.0),
-              TextFormField(
-                onChanged: (value) {
-                  setState(() {
-                    tituloCurto = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Título Curto do Incidente *',
-                  border: OutlineInputBorder(),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                TextFormField(
+                  onChanged: (value) {
+                    setState(() {
+                      tituloCurto = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Título Curto do Incidente *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Este campo é obrigatório';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Este campo é obrigatório';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 12.0),
-              TextFormField(
-                controller: descricaoController,
-                onChanged: (value) {
-                  setState(() {
-                    descricaoDetalhada = value;
-                  });
-                },
-                maxLines: null,
-                decoration: InputDecoration(
-                  labelText: 'Descrição Detalhada',
-                  border: OutlineInputBorder(),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                TextFormField(
+                  controller: descricaoController,
+                  onChanged: (value) {
+                    setState(() {
+                      descricaoDetalhada = value;
+                    });
+                  },
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    labelText: 'Descrição Detalhada',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              SizedBox(height: 12.0),
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black54),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    padding: EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt),
+                        SizedBox(width: 8.0),
+                        Text('Selecionar Imagem'),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black54),
                     borderRadius: BorderRadius.circular(5.0),
                   ),
-                  padding: EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.camera_alt),
-                      SizedBox(width: 8.0),
-                      Text('Selecionar Imagem'),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.01,
+                          left: MediaQuery.of(context).size.width * 0.05,
+                          right: MediaQuery.of(context).size.width * 0.05,
+                        ),
+                        child: Text(
+                          'Gravidade do incidente: *',
+                          style: TextStyle(fontSize: 16),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      SfSlider(
+                        value: gravidade,
+                        min: 1,
+                        max: 5,
+                        stepSize: 1,
+                        interval: 1,
+                        showTicks: true,
+                        showLabels: true,
+                        minorTicksPerInterval: 1,
+                        onChanged: (value) {
+                          setState(() {
+                            gravidade = value;
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
                     ],
                   ),
                 ),
-              ),
-              SizedBox(height: 12.0),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black54), // Cor da borda
-                  borderRadius:
-                  BorderRadius.circular(5.0), // Borda arredondada
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: 5.0, // Padding na parte superior
-                        left: 10.0, // Padding na parte esquerda
-                        right: 10.0, // Padding na parte direita
-                      ),
-                      child: Text(
-                        'Gravidade do incidente: *',
-                        style: TextStyle(fontSize: 16),
-                        textAlign: TextAlign.left,
-                      ),
-                    ),
-                    SfSlider(
-                      value: gravidade,
-                      min: 1,
-                      max: 5,
-                      stepSize: 1,
-                      interval: 1,
-                      showTicks: true,
-                      showLabels: true,
-                      minorTicksPerInterval: 1,
-                      onChanged: (value) {
-                        setState(() {
-                          gravidade = value;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 10),
-                  ],
-                ),
-              ),
-              SizedBox(height: 12.0),
-              DateTimeField(
-                format: DateFormat("dd/MM/yyyy HH:mm"),
-                initialValue: data,
-                onChanged: (value) {
-                  setState(() {
-                    data = value!;
-                  });
-                },
-                onShowPicker: (context, currentValue) async {
-                  final date = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime(2015, 8),
-                    initialDate: currentValue ?? DateTime.now(),
-                    lastDate: DateTime(2034),
-                  );
-                  if (date != null) {
-                    final time = await showTimePicker(
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                DateTimeField(
+                  format: DateFormat("dd/MM/yyyy HH:mm"),
+                  initialValue: data,
+                  onChanged: (value) {
+                    setState(() {
+                      data = value!;
+                    });
+                  },
+                  onShowPicker: (context, currentValue) async {
+                    final date = await showDatePicker(
                       context: context,
-                      initialTime: TimeOfDay.fromDateTime(
-                          currentValue ?? DateTime.now()),
+                      firstDate: DateTime(2015, 8),
+                      initialDate: currentValue ?? DateTime.now(),
+                      lastDate: DateTime(2034),
                     );
-                    return DateTimeField.combine(date, time);
-                  } else {
-                    return currentValue;
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: 'Data e Hora *',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Este campo é obrigatório';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10.0),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Incidente novoIncidente = Incidente(
-                        nomeParque!,
-                        tituloCurto!,
-                        data,
-                        descricaoDetalhada,
-                        gravidade.toInt(),
-                        _imageFile,
+                    if (date != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(
+                            currentValue ?? DateTime.now()),
                       );
-
-                      adicionarIncidenteAoParqueSelecionado(novoIncidente);
-
-                      _formKey.currentState!.reset();
-
-                      _exibirPopUp();
+                      return DateTimeField.combine(date, time);
+                    } else {
+                      return currentValue;
                     }
                   },
-                  child: Text('Submeter'),
+                  decoration: InputDecoration(
+                    labelText: 'Data e Hora *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Este campo é obrigatório';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-            ],
+                SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        Incidente novoIncidente = Incidente(
+                          nomeParque!,
+                          tituloCurto!,
+                          data,
+                          descricaoDetalhada,
+                          gravidade.toInt(),
+                          _imageFile,
+                        );
+
+                        adicionarIncidenteAoParqueSelecionado(novoIncidente);
+
+                        _formKey.currentState!.reset();
+
+                        _exibirPopUp();
+                      }
+                    },
+                    child: Text('Submeter'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

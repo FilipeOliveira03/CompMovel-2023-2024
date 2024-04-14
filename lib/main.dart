@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/main_page.dart';
+import 'package:proj_comp_movel/pages.dart';
 
 
 void main() {
@@ -14,6 +15,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var colorScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent);
+
+    minhaListaParques.parques.sort((a, b) => a.distancia.compareTo(b.distancia));
 
     return MaterialApp(
       title: 'Parques Emel',

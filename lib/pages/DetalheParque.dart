@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
 import 'package:proj_comp_movel/pages/Mapa.dart';
 import 'package:proj_comp_movel/pages/RegistoIncidentes.dart';
@@ -23,42 +21,21 @@ class DetalheParque extends StatelessWidget {
       endIndent: 20,
     );
 
-    /*
-    var incidente1 = Incidente(
-        "Parque A",
-        "Buraco no chão",
-        DateTime(2024, 3, 29, 8, 00),
-        "Existe um buraco no chão enorme perto da zona de pagamento",
-        4,
-        'assets/ImagensIncidentes/buraco.jpg'
-    );
-
-    var incidente2 = Incidente(
-        "Parque A",
-        "Buraco no chão 2",
-        DateTime(2024, 3, 29, 8, 00),
-        "Existe um buraco no chão enorme perto da zona de pagamento",
-        4,
-        null,
-    );
-
-    parque.incidentes.add(incidente1);
-    parque.incidentes.add(incidente2);
-    parque.incidentes.add(incidente1);
-    parque.incidentes.add(incidente2);
-*/
-
     Color corDisponibilidade;
 
     switch (parque.disponibilidade) {
       case DISPONIBILIDADE.DISPONIVEL:
         corDisponibilidade = Colors.green;
+        break;
       case DISPONIBILIDADE.PARCIALMENTE_LOTADO:
         corDisponibilidade = Colors.amber;
+        break;
       case DISPONIBILIDADE.QUASE_LOTADO:
         corDisponibilidade = Colors.redAccent;
+        break;
       case DISPONIBILIDADE.LOTADO:
         corDisponibilidade = Colors.red.shade900;
+        break;
     }
 
     Color preto = Colors.black;
@@ -75,9 +52,16 @@ class DetalheParque extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            informacaoParque(parque: parque, barra: barra, corDisponibilidade: corDisponibilidade, preto: preto),
+            informacaoParque(
+              parque: parque,
+              barra: barra,
+              corDisponibilidade: corDisponibilidade,
+              preto: preto,
+            ),
             barra,
-            incidentesReportados(parque: parque),
+            Expanded(
+              child: incidentesReportados(parque: parque),
+            ),
             barra,
             butoesBaixo(),
           ],
@@ -85,17 +69,16 @@ class DetalheParque extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class informacaoParque extends StatelessWidget {
   const informacaoParque({
-    super.key,
+    Key? key,
     required this.parque,
     required this.barra,
     required this.corDisponibilidade,
     required this.preto,
-  });
+  }) : super(key: key);
 
   final Parque parque;
   final Divider barra;
@@ -105,14 +88,14 @@ class informacaoParque extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 380,
+      height: MediaQuery.of(context).size.height * 0.48,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(height: 20),
           Container(
-            width: 200,
-            height: 180,
+            width: MediaQuery.of(context).size.width * 0.6,
+            height: MediaQuery.of(context).size.height * 0.2,
             decoration: BoxDecoration(
               border: Border.all(
                 color: Colors.black,
@@ -130,8 +113,8 @@ class informacaoParque extends StatelessWidget {
             child: parque.assertImagem != null
                 ? Image.asset(
                     parque.assertImagem!,
-                    width: 300,
-                    height: 300,
+                    width: 350,
+                    height: 350,
                     fit: BoxFit.cover,
                   )
                 : Center(
@@ -143,14 +126,38 @@ class informacaoParque extends StatelessWidget {
           ),
           SizedBox(height: 10),
           barra,
-
           textoDistancia(parque: parque),
-          textoInformacoes(textoNegrito: 'Disponibilidade: ', textoNormal: parque.disponibilidade.string, cor: corDisponibilidade),
-          textoInformacoes(textoNegrito: 'Lotação: ', textoNormal: '${parque.lotAtual}/${parque.lotMaxima}', cor: preto),
-          textoInformacoes(textoNegrito: 'Horário: ', textoNormal: '${parque.horarioAbertura.hour}:${parque.horarioAbertura.minute.toString().padLeft(2, '0')} - ${parque.horarioFecho.hour}:${parque.horarioFecho.minute.toString().padLeft(2, '0')}', cor: preto),
-          textoInformacoes(textoNegrito: 'Preço p/hora: ', textoNormal: '${parque.preco.toStringAsFixed(2)}€', cor: preto),
-          textoInformacoes(textoNegrito: 'Tipo de Parque: ', textoNormal: parque.tipoParque.string, cor: preto),
-          textoInformacoes(textoNegrito: 'Morada: ', textoNormal: parque.morada, cor: preto),
+          textoInformacoes(
+            textoNegrito: 'Disponibilidade: ',
+            textoNormal: parque.disponibilidade.string,
+            cor: corDisponibilidade,
+          ),
+          textoInformacoes(
+            textoNegrito: 'Lotação: ',
+            textoNormal: '${parque.lotAtual}/${parque.lotMaxima}',
+            cor: preto,
+          ),
+          textoInformacoes(
+            textoNegrito: 'Horário: ',
+            textoNormal:
+                '${parque.horarioAbertura.hour}:${parque.horarioAbertura.minute.toString().padLeft(2, '0')} - ${parque.horarioFecho.hour}:${parque.horarioFecho.minute.toString().padLeft(2, '0')}',
+            cor: preto,
+          ),
+          textoInformacoes(
+            textoNegrito: 'Preço p/hora: ',
+            textoNormal: '${parque.preco.toStringAsFixed(2)}€',
+            cor: preto,
+          ),
+          textoInformacoes(
+            textoNegrito: 'Tipo de Parque: ',
+            textoNormal: parque.tipoParque.string,
+            cor: preto,
+          ),
+          textoInformacoes(
+            textoNegrito: 'Morada: ',
+            textoNormal: parque.morada,
+            cor: preto,
+          ),
         ],
       ),
     );
@@ -159,57 +166,57 @@ class informacaoParque extends StatelessWidget {
 
 class textoDistancia extends StatelessWidget {
   const textoDistancia({
-    super.key,
+    Key? key,
     required this.parque,
-  });
+  }) : super(key: key);
 
   final Parque parque;
 
   @override
   Widget build(BuildContext context) {
-
     var textoDistancia = '';
 
-
-    if(parque.distancia.toString().length > 3){
-      textoDistancia = '${parque.distancia ~/ 1000}.${(parque.distancia ~/ 100) % 10} km ';
-    }else{
+    if (parque.distancia.toString().length > 3) {
+      textoDistancia =
+          '${parque.distancia ~/ 1000}.${(parque.distancia ~/ 100) % 10} km ';
+    } else {
       textoDistancia = '${parque.distancia} m ';
     }
 
-    return RichText(text: TextSpan(
-      style: TextStyle(
-        fontSize: 18,
-        color: Colors.black,
-        fontWeight: FontWeight.normal,
-      ),
-      children: <TextSpan>[
-        TextSpan(
-          text: 'Parque a ',
-
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.black,
+          fontWeight: FontWeight.normal,
         ),
-        TextSpan(
-            text: textoDistancia,
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-            color: Colors.green
+        children: <TextSpan>[
+          TextSpan(
+            text: 'Parque a ',
           ),
-        ),
-        TextSpan(
-          text: 'de si',
-        ),
-      ],
-    ));
+          TextSpan(
+            text: textoDistancia,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.green,
+            ),
+          ),
+          TextSpan(
+            text: 'de si',
+          ),
+        ],
+      ),
+    );
   }
 }
 
 class textoInformacoes extends StatelessWidget {
   const textoInformacoes({
-    super.key,
+    Key? key,
     required this.textoNegrito,
     required this.textoNormal,
     required this.cor,
-  });
+  }) : super(key: key);
 
   final String textoNegrito;
   final String textoNormal;
@@ -230,10 +237,11 @@ class textoInformacoes extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           TextSpan(
-              text: textoNormal,
-              style: TextStyle(
-                color: cor,
-              )),
+            text: textoNormal,
+            style: TextStyle(
+              color: cor,
+            ),
+          ),
         ],
       ),
     );
@@ -241,9 +249,7 @@ class textoInformacoes extends StatelessWidget {
 }
 
 class butoesBaixo extends StatelessWidget {
-  const butoesBaixo({
-    super.key,
-  });
+  const butoesBaixo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -254,8 +260,9 @@ class butoesBaixo extends StatelessWidget {
         children: [
           OutlinedButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>Mapa()));
-              },
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Mapa()));
+            },
             style: OutlinedButton.styleFrom(
               backgroundColor: Colors.blue,
             ),
@@ -266,7 +273,8 @@ class butoesBaixo extends StatelessWidget {
           ),
           OutlinedButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>RegistoIncidentes()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => RegistoIncidentes()));
             },
             style: OutlinedButton.styleFrom(
               backgroundColor: Colors.blue,
@@ -284,9 +292,9 @@ class butoesBaixo extends StatelessWidget {
 
 class incidentesReportados extends StatelessWidget {
   const incidentesReportados({
-    super.key,
+    Key? key,
     required this.parque,
-  });
+  }) : super(key: key);
 
   final Parque parque;
 
@@ -294,14 +302,15 @@ class incidentesReportados extends StatelessWidget {
   Widget build(BuildContext context) {
     if (parque.incidentes.isEmpty) {
       return Container(
-          height: 170,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Text('Não foram reportados incidentes')],
-          ));
+        height: MediaQuery.of(context).size.height * 0.15,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Text('Não foram reportados incidentes')],
+        ),
+      );
     }
     return Container(
-      height: 170,
+      height: MediaQuery.of(context).size.height * 0.15,
       child: ListView.builder(
         physics: ClampingScrollPhysics(),
         itemCount: parque.incidentes.length,
@@ -310,13 +319,13 @@ class incidentesReportados extends StatelessWidget {
             child: ListTile(
               onTap: () {
                 showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return IntrinsicHeight(
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          child: Center(
-                              child: Column(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return IntrinsicHeight(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Center(
+                          child: Column(
                             children: [
                               Text(
                                 parque.incidentes[index].tituloCurto,
@@ -404,10 +413,12 @@ class incidentesReportados extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          )),
+                          ),
                         ),
-                      );
-                    });
+                      ),
+                    );
+                  },
+                );
               },
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

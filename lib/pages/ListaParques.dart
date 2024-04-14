@@ -11,17 +11,16 @@ class ListaParques extends StatefulWidget {
 }
 
 class _ListaParquesState extends State<ListaParques> {
-  bool ordenarPorDistanciaCrescente = true; // Inicialmente ordenar crescente
-  List<Parque> listaParques = minhaListaParques.parques; // Lista de parques
+  bool ordenarPorDistanciaCrescente = true;
+  List<Parque> listaParques = minhaListaParques.parques;
 
   void ordenarParquesPorDistancia() {
     setState(() {
-      // Ordenar a lista de parques com base na distância
-      listaParques.sort((a, b) => ordenarPorDistanciaCrescente
-          ? a.distancia.compareTo(b.distancia)
-          : b.distancia.compareTo(a.distancia));
-      // Alternar entre ordenar crescente e decrescente
+      listaParques.sort((a, b) => b.distancia.compareTo(a.distancia));
       ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
+      if (ordenarPorDistanciaCrescente) {
+        listaParques.sort((a, b) => a.distancia.compareTo(b.distancia));
+      }
     });
   }
 
@@ -46,7 +45,7 @@ class _ListaParquesState extends State<ListaParques> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.only(bottom: 60), // Adicionando espaço extra na parte inferior da lista
+                padding: EdgeInsets.only(bottom: 60),
                 itemCount: listaParques.length,
                 itemBuilder: (context, index) {
                   Parque parque = listaParques[index];
@@ -70,15 +69,14 @@ class _ListaParquesState extends State<ListaParques> {
                       );
                     },
                     child: Container(
-                      margin: EdgeInsets.only(bottom: 10, right: 15, left: 15),
+                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                       child: Card(
                         child: Padding(
                           padding: EdgeInsets.all(10),
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
                                     label: parque.nome,
@@ -95,8 +93,7 @@ class _ListaParquesState extends State<ListaParques> {
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
                                     label: '${parque.preco.toStringAsFixed(2)}€/hr',
@@ -127,12 +124,19 @@ class _ListaParquesState extends State<ListaParques> {
                 },
               ),
             ),
-            SizedBox(height: 15),
+            Divider(
+              height: 15,
+              thickness: 2,
+              color: Colors.grey,
+              indent: 20,
+              endIndent: 20,
+            ),
             ElevatedButton.icon(
               onPressed: ordenarParquesPorDistancia,
               icon: Icon(ordenarPorDistanciaCrescente ? Icons.arrow_upward : Icons.arrow_downward),
-              label: Text('Ordenar por Distância ${ordenarPorDistanciaCrescente ? 'crescente' : 'decrescente'}'),
+              label: Text('Ordenar por Distância ${ordenarPorDistanciaCrescente ? 'decrescente' : 'crescente'}'),
             ),
+            SizedBox(height: 5),
           ],
         ),
       ),
@@ -234,7 +238,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 45,
-      width: 365,
+      width: MediaQuery.of(context).size.width * 0.9,
       child: SearchAnchor.bar(
         barHintText: 'Procura parques',
         onSubmitted: (String value) {
