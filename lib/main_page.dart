@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/pages.dart';
+import 'package:provider/provider.dart';
 
 import 'pages/Dashboard.dart';
+
+class MainPageViewModel extends ChangeNotifier{
+  int _selectedIndex = 0;
+
+  int get selectedIndex => _selectedIndex;
+
+  set selectedIndex(int value){
+    _selectedIndex = value;
+    notifyListeners();
+  }
+}
 
 class MainPage extends StatefulWidget {
   MainPage({super.key});
@@ -11,10 +23,12 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+
+    final viewModel = context.watch<MainPageViewModel>();
+
     return MaterialApp(
       theme: ThemeData(
         navigationBarTheme: NavigationBarThemeData(
@@ -29,10 +43,10 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
       home: Scaffold(
-        body: pages[_selectedIndex].widget,
+        body: pages[viewModel.selectedIndex].widget,
         bottomNavigationBar: NavigationBar(
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+          selectedIndex: viewModel.selectedIndex,
+          onDestinationSelected: (index) => viewModel.selectedIndex = index,
           destinations: pages.map((page) => NavigationDestination(icon: Icon(page.icon), label: page.title)).toList(),
         ),
       ),

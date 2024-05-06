@@ -1,8 +1,10 @@
 import 'package:cross_file_image/cross_file_image.dart';
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
+import 'package:proj_comp_movel/main_page.dart';
 import 'package:proj_comp_movel/pages/Mapa.dart';
 import 'package:proj_comp_movel/pages/RegistoIncidentes.dart';
+import 'package:provider/provider.dart';
 
 import '../classes/Parque.dart';
 import '../pages.dart';
@@ -261,8 +263,8 @@ class butoesBaixo extends StatelessWidget {
         children: [
           OutlinedButton(
             onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Mapa()));
+              context.read<MainPageViewModel>().selectedIndex = 2;
+              Navigator.pop(context);
             },
             style: OutlinedButton.styleFrom(
               backgroundColor: Colors.blue,
@@ -274,8 +276,8 @@ class butoesBaixo extends StatelessWidget {
           ),
           OutlinedButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => RegistoIncidentes()));
+              context.read<MainPageViewModel>().selectedIndex = 3;
+              Navigator.pop(context);
             },
             style: OutlinedButton.styleFrom(
               backgroundColor: Colors.blue,

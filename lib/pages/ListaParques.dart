@@ -76,7 +76,8 @@ class _ListaParquesState extends State<ListaParques> {
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
                                     label: parque.nome,
@@ -93,16 +94,19 @@ class _ListaParquesState extends State<ListaParques> {
                                 ],
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
-                                    label: '${parque.preco.toStringAsFixed(2)}€/hr',
+                                    label:
+                                        '${parque.preco.toStringAsFixed(2)}€/hr',
                                     tamanho: 14,
                                     cor: Colors.black54,
                                     font: FontWeight.normal,
                                   ),
                                   textoParqProx(
-                                    label: '${parque.lotMaxima - parque.lotAtual} Lugares Vazios!',
+                                    label:
+                                        '${parque.lotMaxima - parque.lotAtual} Lugares Vazios!',
                                     tamanho: 14,
                                     cor: corLotacao,
                                     font: FontWeight.bold,
@@ -133,8 +137,11 @@ class _ListaParquesState extends State<ListaParques> {
             ),
             ElevatedButton.icon(
               onPressed: ordenarParquesPorDistancia,
-              icon: Icon(ordenarPorDistanciaCrescente ? Icons.arrow_upward : Icons.arrow_downward),
-              label: Text('Ordenar por Distância ${ordenarPorDistanciaCrescente ? 'decrescente' : 'crescente'}'),
+              icon: Icon(ordenarPorDistanciaCrescente
+                  ? Icons.arrow_upward
+                  : Icons.arrow_downward),
+              label: Text(
+                  'Ordenar por Distância ${ordenarPorDistanciaCrescente ? 'decrescente' : 'crescente'}'),
             ),
             SizedBox(height: 5),
           ],
@@ -183,7 +190,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
 
   Iterable<Widget> getListaHistorico(SearchController controller) {
     return historico.map(
-          (Parque parque) => ListTile(
+      (Parque parque) => ListTile(
         leading: const Icon(Icons.history),
         title: Text(parque.nome),
         trailing: IconButton(
@@ -204,25 +211,25 @@ class _SearchBarAppState extends State<SearchBarApp> {
         .where((Parque parque) => parque.nome.contains(input))
         .map(
           (Parque parque) => ListTile(
-        title: Text(parque.nome),
-        trailing: IconButton(
-          icon: const Icon(Icons.call_missed),
-          onPressed: () {
-            controller.text = parque.nome;
-            controller.selection =
-                TextSelection.collapsed(offset: controller.text.length);
-          },
-        ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DetalheParque(parque: parque)),
-          );
-          mudaHistorico(parque);
-        },
-      ),
-    );
+            title: Text(parque.nome),
+            trailing: IconButton(
+              icon: const Icon(Icons.call_missed),
+              onPressed: () {
+                controller.text = parque.nome;
+                controller.selection =
+                    TextSelection.collapsed(offset: controller.text.length);
+              },
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetalheParque(parque: parque)),
+              );
+              mudaHistorico(parque);
+            },
+          ),
+        );
   }
 
   void mudaHistorico(Parque parque) {
@@ -256,11 +263,13 @@ class _SearchBarAppState extends State<SearchBarApp> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DetalheParque(parque: parqueEncontrado)),
+                  builder: (context) =>
+                      DetalheParque(parque: parqueEncontrado)),
             );
           }
         },
-        suggestionsBuilder: (BuildContext context, SearchController controller) {
+        suggestionsBuilder:
+            (BuildContext context, SearchController controller) {
           if (controller.text.isEmpty) {
             if (historico.isNotEmpty) {
               return getListaHistorico(controller);

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:proj_comp_movel/pages/DetalheParque.dart';
 
 import 'classes/Incidente.dart';
-import 'classes/ListParques.dart';
+import 'classes/ParquesRepository.dart';
 import 'pages/Dashboard.dart';
 import 'pages/ListaParques.dart';
 import 'pages/Mapa.dart';

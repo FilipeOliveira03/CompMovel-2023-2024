@@ -3,10 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/main_page.dart';
 import 'package:proj_comp_movel/pages.dart';
-
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (BuildContext context) => MainPageViewModel(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var colorScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent);
 
-    minhaListaParques.parques.sort((a, b) => a.distancia.compareTo(b.distancia));
+    minhaListaParques.parques
+        .sort((a, b) => a.distancia.compareTo(b.distancia));
 
     return MaterialApp(
       title: 'Parques Emel',
