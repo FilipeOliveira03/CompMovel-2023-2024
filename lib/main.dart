@@ -5,11 +5,18 @@ import 'package:proj_comp_movel/main_page.dart';
 import 'package:proj_comp_movel/pages.dart';
 import 'package:provider/provider.dart';
 
+import 'classes/ParquesRepository.dart';
+
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (BuildContext context) => MainPageViewModel(),
-    child: MyApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider(create: (_) => ParquesRepository()),
+        ChangeNotifierProvider(create: (_) => MainPageViewModel()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,8 +25,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var colorScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent);
-
-    minhaListaParques.parques
+    final minhaListaParques = context.read<ParquesRepository>().getParques();
+    minhaListaParques
         .sort((a, b) => a.distancia.compareTo(b.distancia));
 
     return MaterialApp(

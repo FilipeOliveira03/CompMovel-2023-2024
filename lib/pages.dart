@@ -8,7 +8,7 @@ import 'pages/ListaParques.dart';
 import 'pages/Mapa.dart';
 import 'pages/RegistoIncidentes.dart';
 
-final ListParques minhaListaParques = ListParques();
+
 final ListaIncidente minhaListaIncidentes = ListaIncidente();
 
 final pages = [

@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 import '../classes/Incidente.dart';
 import '../classes/Parque.dart';
+import '../classes/ParquesRepository.dart';
 import '../main_page.dart';
 import '../pages.dart';
 
 class RegistoIncidentes extends StatefulWidget {
-  final String? initialParque; // Adiciona este parâmetro opcional
+  final String? initialParque;
 
   RegistoIncidentes({super.key, this.initialParque});
 
@@ -34,13 +36,20 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
   @override
   void initState() {
     super.initState();
-    for (Parque parque in minhaListaParques.parques) {
-      listaParques.add(parque.nome);
-    }
+
+    // Obtém a lista de parques do repositório
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final minhaListaParques = context.read<ParquesRepository>().getParques();
+      setState(() {
+        for (Parque parque in minhaListaParques) {
+          listaParques.add(parque.nome);
+        }
+      });
+    });
   }
 
-  void adicionarIncidenteAoParqueSelecionado(Incidente incidente) {
-    Parque? parqueSelecionado = minhaListaParques.parques.firstWhere(
+  void adicionarIncidenteAoParqueSelecionado(var minhaListaParques, Incidente incidente) {
+    Parque? parqueSelecionado = minhaListaParques.firstWhere(
       (parque) => parque.nome == nomeParque,
     );
 
@@ -84,6 +93,9 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
 
   @override
   Widget build(BuildContext context) {
+
+    final minhaListaParques = context.read<ParquesRepository>().getParques();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Formulário de Incidentes'),
@@ -115,7 +127,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 buildDataHora(),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                buildValidacaoFormulario(),
+                buildValidacaoFormulario(minhaListaParques),
               ],
             ),
           ),
@@ -124,7 +136,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
     );
   }
 
-  Center buildValidacaoFormulario() {
+  Center buildValidacaoFormulario(var minhaListaParques) {
     return Center(
       child: ElevatedButton(
         onPressed: () {
@@ -151,7 +163,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
               );
             }
 
-            adicionarIncidenteAoParqueSelecionado(novoIncidente);
+            adicionarIncidenteAoParqueSelecionado(minhaListaParques, novoIncidente);
 
             _formKey.currentState!.reset();
 

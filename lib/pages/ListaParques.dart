@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/pages/DetalheParque.dart';
+import 'package:provider/provider.dart';
 import '../classes/Parque.dart';
+import '../classes/ParquesRepository.dart';
 import '../pages.dart';
 
 class ListaParques extends StatefulWidget {
@@ -12,20 +14,22 @@ class ListaParques extends StatefulWidget {
 
 class _ListaParquesState extends State<ListaParques> {
   bool ordenarPorDistanciaCrescente = true;
-  List<Parque> listaParques = minhaListaParques.parques;
-
-  void ordenarParquesPorDistancia() {
-    setState(() {
-      listaParques.sort((a, b) => b.distancia.compareTo(a.distancia));
-      ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
-      if (ordenarPorDistanciaCrescente) {
-        listaParques.sort((a, b) => a.distancia.compareTo(b.distancia));
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+
+    List<Parque> listaParques = context.read<ParquesRepository>().getParques();
+
+    void ordenarParquesPorDistancia() {
+      setState(() {
+        listaParques.sort((a, b) => b.distancia.compareTo(a.distancia));
+        ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
+        if (ordenarPorDistanciaCrescente) {
+          listaParques.sort((a, b) => a.distancia.compareTo(b.distancia));
+        }
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista de Parques'),
@@ -189,6 +193,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
   List<Parque> historico = <Parque>[];
 
   Iterable<Widget> getListaHistorico(SearchController controller) {
+
     return historico.map(
       (Parque parque) => ListTile(
         leading: const Icon(Icons.history),
@@ -207,7 +212,8 @@ class _SearchBarAppState extends State<SearchBarApp> {
 
   Iterable<Widget> getSugestoes(SearchController controller) {
     final String input = controller.value.text;
-    return minhaListaParques.parques
+    final minhaListaParques = context.read<ParquesRepository>().getParques();
+    return minhaListaParques
         .where((Parque parque) => parque.nome.contains(input))
         .map(
           (Parque parque) => ListTile(
@@ -243,6 +249,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
 
   @override
   Widget build(BuildContext context) {
+    final minhaListaParques = context.read<ParquesRepository>().getParques();
     return SizedBox(
       height: 45,
       width: MediaQuery.of(context).size.width * 0.9,
@@ -252,10 +259,10 @@ class _SearchBarAppState extends State<SearchBarApp> {
           bool existe = false;
           var parqueEncontrado;
 
-          for (var i = 0; i < minhaListaParques.parques.length; i++) {
-            if (minhaListaParques.parques[i].nome == value) {
+          for (var i = 0; i < minhaListaParques.length; i++) {
+            if (minhaListaParques[i].nome == value) {
               existe = true;
-              parqueEncontrado = minhaListaParques.parques[i];
+              parqueEncontrado = minhaListaParques[i];
             }
           }
 

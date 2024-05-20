@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
 import 'package:proj_comp_movel/pages.dart';
+import 'package:provider/provider.dart';
 
 import '../classes/Parque.dart';
+import '../classes/ParquesRepository.dart';
 import '../main.dart';
 import 'DetalheParque.dart';
 
@@ -11,7 +13,8 @@ class Dashboard extends StatelessWidget {
   Dashboard({super.key});
 
   String textoLabel(Incidente incidente) {
-    return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, ás ${incidente.data.hour}:${incidente.data.minute}!';
+    return '   ⚠️   Incidente reportado no Parque ${incidente
+        .nomeParque}, ás ${incidente.data.hour}:${incidente.data.minute}!';
   }
 
   @override
@@ -27,10 +30,12 @@ class Dashboard extends StatelessWidget {
       incidente = textoLabel(listaIncidentesTotais[0]);
     } else if (listaIncidentesTotais.length == 2) {
       incidente =
-      '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])}';
+      '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(
+          listaIncidentesTotais[1])}';
     } else {
       incidente =
-      '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
+      '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(
+          listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
     }
 
     var barra = Divider(
@@ -51,8 +56,14 @@ class Dashboard extends StatelessWidget {
           children: [
             barra,
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.03,
-              width: MediaQuery.of(context).size.width * 0.92,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.03,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.92,
               child: Marquee(
                 text: incidente,
                 style: TextStyle(
@@ -64,11 +75,17 @@ class Dashboard extends StatelessWidget {
             barra,
             textoInfoWidget(texto1: 'Parques próximos'),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.02,
             ),
             miniMapaWidget(),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.02,
             ),
             Expanded(
               child: tresParquesProxWidget(),
@@ -87,10 +104,54 @@ class tresParquesProxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final minhaListaParques = context.read<ParquesRepository>().getParques();
+
+    var lista = List<Parque>.from(minhaListaParques);
+
+    if (lista.length >= 3) {
+      return listaParquesPertoWidget(lista: lista, itemCount: 3,);
+    }else if(lista.length == 2){
+      return listaParquesPertoWidget(lista: lista, itemCount: 2,);
+    }else if(lista.length == 1){
+      return listaParquesPertoWidget(lista: lista, itemCount: 1,);
+    } else {
+      return Container(
+        margin: EdgeInsets.only(bottom: 10, right: 45, left: 45),
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Center(
+            child: Text(
+              'Não existem parques próximos de si',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+              fontSize: 25,
+              color: Colors.black,
+
+            ),
+          ),
+        ),
+      ),);
+  }
+
+  }
+}
+
+class listaParquesPertoWidget extends StatelessWidget {
+  const listaParquesPertoWidget({
+    super.key,
+    required this.lista,
+    required this.itemCount
+  });
+
+  final List<Parque> lista;
+  final int itemCount;
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: 3,
+      itemCount: itemCount,
       itemBuilder: (context, index) {
-        var lista = List<Parque>.from(minhaListaParques.parques);
         lista.sort((a, b) => a.distancia.compareTo(b.distancia));
         Parque parque = lista[index];
 
@@ -150,7 +211,8 @@ class tresParquesProxWidget extends StatelessWidget {
                         ),
                         textoParqProx(
                           label:
-                          '${parque.lotMaxima - parque.lotAtual} Lugares Vazios!',
+                          '${parque.lotMaxima -
+                              parque.lotAtual} Lugares Vazios!',
                           tamanho: 14,
                           cor: corLotacao,
                           font: FontWeight.bold,
@@ -215,8 +277,14 @@ class miniMapaWidget extends StatelessWidget {
           child: Image.asset(
             'assets/maps_aumentado.png',
             fit: BoxFit.cover,
-            height: MediaQuery.of(context).size.height * 0.25,
-            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.25,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.8,
           ),
         ),
         Positioned.fill(

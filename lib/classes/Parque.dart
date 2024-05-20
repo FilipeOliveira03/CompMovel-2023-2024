@@ -54,7 +54,17 @@ class Parque {
   String? assertImagem;
   List<Incidente> incidentes = [];
 
-  Parque(this.nome, this.disponibilidade ,this.tipoParque, this.lotAtual ,this.lotMaxima, this.distancia ,this.horarioAbertura,
-      this.horarioFecho, this.morada, this.preco, this.assertImagem);
+  Parque(
+      {required this.nome,
+        required this.disponibilidade,
+        required this.tipoParque,
+        required this.lotAtual,
+        required this.lotMaxima,
+        required this.distancia,
+        required this.horarioAbertura,
+        required this.horarioFecho,
+        required this.morada,
+        required this.preco,
+        this.assertImagem});
 
 }
