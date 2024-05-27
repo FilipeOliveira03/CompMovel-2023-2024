@@ -80,7 +80,15 @@ class _ListaParquesState extends State<ListaParques> {
                 itemCount: listaLots.length,
                 itemBuilder: (context, index) {
                   Lote lote = listaLots[index];
-                  var lotAtual = lote.lotMaxima - lote.lotAtual;
+
+                  var lotOcupacao = lote.lotAtual;
+
+                  if(lotOcupacao < 0){
+                    lotOcupacao = lote.lotMaxima;
+                  }
+
+                  var lotAtual = lote.lotMaxima - lotOcupacao;
+
                   var corLotacao;
                   if (lotAtual == 0) {
                     corLotacao = Colors.red;
@@ -137,7 +145,7 @@ class _ListaParquesState extends State<ListaParques> {
                                   ),
                                   textoParqProx(
                                     label:
-                                        '${lote.lotMaxima - lote.lotAtual} Lugares Vazios!',
+                                        '${lotAtual} Lugares Vazios!',
                                     tamanho: 14,
                                     cor: corLotacao,
                                     font: FontWeight.bold,

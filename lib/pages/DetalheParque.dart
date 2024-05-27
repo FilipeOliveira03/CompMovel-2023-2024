@@ -219,6 +219,11 @@ class _informacaoParqueState extends State<informacaoParque> {
             textoNormal: '${tarifa.duracaoMax.toString()} horas',
             cor: widget.preto,
           ),
+          textoInformacoes(
+            textoNegrito: 'Informação atualizada as ',
+            textoNormal: widget.lote.dataAtualizacao.split(' ')[1],
+            cor: widget.preto,
+          ),
         ],
       ),
     );
