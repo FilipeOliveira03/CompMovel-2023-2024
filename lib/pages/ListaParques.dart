@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/pages/DetalheParque.dart';
 import 'package:provider/provider.dart';
+import '../classes/Lote.dart';
 import '../classes/Parque.dart';
 import '../classes/ParquesRepository.dart';
 import '../pages.dart';
@@ -13,21 +14,47 @@ class ListaParques extends StatefulWidget {
 }
 
 class _ListaParquesState extends State<ListaParques> {
+  List<Lote> listaLots = [];
   bool ordenarPorDistanciaCrescente = true;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarParques();
+  }
+
+  Future<void> _carregarParques() async {
+    final minhaListaParques =
+        await context.read<ParquesRepository>().getLots();
+
+    setState(() {
+      listaLots = minhaListaParques;
+      isLoading = false;
+    });
+  }
+
+  void ordenarParquesPorDistancia() {
+    // setState(() {
+    //   listaParques.sort((a, b) => b.distancia.compareTo(a.distancia));
+    //   ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
+    //   if (ordenarPorDistanciaCrescente) {
+    //     listaParques.sort((a, b) => a.distancia.compareTo(b.distancia));
+    //   }
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    List<Parque> listaParques = context.read<ParquesRepository>().getParques();
-
-    void ordenarParquesPorDistancia() {
-      setState(() {
-        listaParques.sort((a, b) => b.distancia.compareTo(a.distancia));
-        ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
-        if (ordenarPorDistanciaCrescente) {
-          listaParques.sort((a, b) => a.distancia.compareTo(b.distancia));
-        }
-      });
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Lista de Parques'),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Scaffold(
@@ -50,14 +77,14 @@ class _ListaParquesState extends State<ListaParques> {
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.only(bottom: 60),
-                itemCount: listaParques.length,
+                itemCount: listaLots.length,
                 itemBuilder: (context, index) {
-                  Parque parque = listaParques[index];
-                  var lotAtual = parque.lotMaxima - parque.lotAtual;
+                  Lote lote = listaLots[index];
+                  var lotAtual = lote.lotMaxima - lote.lotAtual;
                   var corLotacao;
                   if (lotAtual == 0) {
                     corLotacao = Colors.red;
-                  } else if (lotAtual < (parque.lotMaxima * 0.1).toInt()) {
+                  } else if (lotAtual < (lote.lotMaxima * 0.1).toInt()) {
                     corLotacao = Colors.amber;
                   } else {
                     corLotacao = Colors.green;
@@ -68,7 +95,7 @@ class _ListaParquesState extends State<ListaParques> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetalheParque(parque: parque),
+                          builder: (context) => DetalheParque(lote: lote),
                         ),
                       );
                     },
@@ -84,17 +111,17 @@ class _ListaParquesState extends State<ListaParques> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
-                                    label: parque.nome,
+                                    label: lote.nome,
                                     tamanho: 18,
                                     cor: Colors.black,
                                     font: FontWeight.bold,
                                   ),
-                                  textoParqProx(
-                                    label: parque.distancia.toString(),
-                                    tamanho: 20,
-                                    cor: Colors.black,
-                                    font: FontWeight.bold,
-                                  ),
+                                  // textoParqProx(
+                                  //   label: lote.distancia.toString(),
+                                  //   tamanho: 20,
+                                  //   cor: Colors.black,
+                                  //   font: FontWeight.bold,
+                                  // ),
                                 ],
                               ),
                               Row(
@@ -103,14 +130,14 @@ class _ListaParquesState extends State<ListaParques> {
                                 children: [
                                   textoParqProx(
                                     label:
-                                        '${parque.preco.toStringAsFixed(2)}€/hr',
+                                    lote.tipoParque,
                                     tamanho: 14,
                                     cor: Colors.black54,
                                     font: FontWeight.normal,
                                   ),
                                   textoParqProx(
                                     label:
-                                        '${parque.lotMaxima - parque.lotAtual} Lugares Vazios!',
+                                        '${lote.lotMaxima - lote.lotAtual} Lugares Vazios!',
                                     tamanho: 14,
                                     cor: corLotacao,
                                     font: FontWeight.bold,
@@ -190,18 +217,31 @@ class SearchBarApp extends StatefulWidget {
 }
 
 class _SearchBarAppState extends State<SearchBarApp> {
-  List<Parque> historico = <Parque>[];
+  List<Lote> historico = <Lote>[];
+  List<Lote> minhaListaParques = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarParques();
+  }
+
+  Future<void> _carregarParques() async {
+    final lista = await context.read<ParquesRepository>().getLots();
+    setState(() {
+      minhaListaParques = lista;
+    });
+  }
 
   Iterable<Widget> getListaHistorico(SearchController controller) {
-
     return historico.map(
-      (Parque parque) => ListTile(
+      (Lote lote) => ListTile(
         leading: const Icon(Icons.history),
-        title: Text(parque.nome),
+        title: Text(lote.nome),
         trailing: IconButton(
           icon: const Icon(Icons.call_missed),
           onPressed: () {
-            controller.text = parque.nome;
+            controller.text = lote.nome;
             controller.selection =
                 TextSelection.collapsed(offset: controller.text.length);
           },
@@ -212,16 +252,15 @@ class _SearchBarAppState extends State<SearchBarApp> {
 
   Iterable<Widget> getSugestoes(SearchController controller) {
     final String input = controller.value.text;
-    final minhaListaParques = context.read<ParquesRepository>().getParques();
     return minhaListaParques
-        .where((Parque parque) => parque.nome.contains(input))
+        .where((Lote lote) => lote.nome.contains(input))
         .map(
-          (Parque parque) => ListTile(
-            title: Text(parque.nome),
+          (Lote lote) => ListTile(
+            title: Text(lote.nome),
             trailing: IconButton(
               icon: const Icon(Icons.call_missed),
               onPressed: () {
-                controller.text = parque.nome;
+                controller.text = lote.nome;
                 controller.selection =
                     TextSelection.collapsed(offset: controller.text.length);
               },
@@ -230,26 +269,25 @@ class _SearchBarAppState extends State<SearchBarApp> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => DetalheParque(parque: parque)),
+                    builder: (context) => DetalheParque(lote: lote)),
               );
-              mudaHistorico(parque);
+              mudaHistorico(lote);
             },
           ),
         );
   }
 
-  void mudaHistorico(Parque parque) {
+  void mudaHistorico(Lote lote) {
     setState(() {
       if (historico.length >= 5) {
         historico.removeLast();
       }
-      historico.insert(0, parque);
+      historico.insert(0, lote);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final minhaListaParques = context.read<ParquesRepository>().getParques();
     return SizedBox(
       height: 45,
       width: MediaQuery.of(context).size.width * 0.9,
@@ -257,12 +295,13 @@ class _SearchBarAppState extends State<SearchBarApp> {
         barHintText: 'Procura parques',
         onSubmitted: (String value) {
           bool existe = false;
-          var parqueEncontrado;
+          late Lote parqueEncontrado;
 
-          for (var i = 0; i < minhaListaParques.length; i++) {
-            if (minhaListaParques[i].nome == value) {
+          for (var lote in minhaListaParques) {
+            if (lote.nome == value) {
               existe = true;
-              parqueEncontrado = minhaListaParques[i];
+              parqueEncontrado = lote;
+              break;
             }
           }
 
@@ -271,7 +310,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      DetalheParque(parque: parqueEncontrado)),
+                      DetalheParque(lote: parqueEncontrado)),
             );
           }
         },

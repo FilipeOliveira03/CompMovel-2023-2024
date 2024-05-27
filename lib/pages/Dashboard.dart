@@ -4,6 +4,7 @@ import 'package:proj_comp_movel/classes/Incidente.dart';
 import 'package:proj_comp_movel/pages.dart';
 import 'package:provider/provider.dart';
 
+import '../classes/Lote.dart';
 import '../classes/Parque.dart';
 import '../classes/ParquesRepository.dart';
 import '../main.dart';
@@ -13,8 +14,7 @@ class Dashboard extends StatelessWidget {
   Dashboard({super.key});
 
   String textoLabel(Incidente incidente) {
-    return '   ⚠️   Incidente reportado no Parque ${incidente
-        .nomeParque}, ás ${incidente.data.hour}:${incidente.data.minute}!';
+    return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, às ${incidente.data.hour}:${incidente.data.minute}!';
   }
 
   @override
@@ -29,13 +29,9 @@ class Dashboard extends StatelessWidget {
     } else if (listaIncidentesTotais.length == 1) {
       incidente = textoLabel(listaIncidentesTotais[0]);
     } else if (listaIncidentesTotais.length == 2) {
-      incidente =
-      '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(
-          listaIncidentesTotais[1])}';
+      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])}';
     } else {
-      incidente =
-      '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(
-          listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
+      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
     }
 
     var barra = Divider(
@@ -56,14 +52,8 @@ class Dashboard extends StatelessWidget {
           children: [
             barra,
             SizedBox(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.03,
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.92,
+              height: MediaQuery.of(context).size.height * 0.03,
+              width: MediaQuery.of(context).size.width * 0.92,
               child: Marquee(
                 text: incidente,
                 style: TextStyle(
@@ -75,17 +65,11 @@ class Dashboard extends StatelessWidget {
             barra,
             textoInfoWidget(texto1: 'Parques próximos'),
             SizedBox(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.02,
+              height: MediaQuery.of(context).size.height * 0.02,
             ),
             miniMapaWidget(),
             SizedBox(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.02,
+              height: MediaQuery.of(context).size.height * 0.02,
             ),
             Expanded(
               child: tresParquesProxWidget(),
@@ -97,24 +81,47 @@ class Dashboard extends StatelessWidget {
   }
 }
 
-class tresParquesProxWidget extends StatelessWidget {
-  const tresParquesProxWidget({
-    super.key,
-  });
+class tresParquesProxWidget extends StatefulWidget {
+  const tresParquesProxWidget({super.key});
+
+  @override
+  State<tresParquesProxWidget> createState() => _tresParquesProxState();
+}
+
+class _tresParquesProxState extends State<tresParquesProxWidget> {
+  List<Lote> minhaListaParques = []; // Initialize an empty list
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData(); // Fetch data in initState
+  }
+
+  Future<void> fetchData() async {
+    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    minhaListaParques = await parquesRepository.getLots();
+    setState(() {}); // Ensure the UI updates after fetching data
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    final minhaListaParques = context.read<ParquesRepository>().getParques();
-
-    var lista = List<Parque>.from(minhaListaParques);
+    var lista = List<Lote>.from(minhaListaParques);
 
     if (lista.length >= 3) {
-      return listaParquesPertoWidget(lista: lista, itemCount: 3,);
-    }else if(lista.length == 2){
-      return listaParquesPertoWidget(lista: lista, itemCount: 2,);
-    }else if(lista.length == 1){
-      return listaParquesPertoWidget(lista: lista, itemCount: 1,);
+      return listaParquesPertoWidget(
+        lista: lista,
+        itemCount: 3,
+      );
+    } else if (lista.length == 2) {
+      return listaParquesPertoWidget(
+        lista: lista,
+        itemCount: 2,
+      );
+    } else if (lista.length == 1) {
+      return listaParquesPertoWidget(
+        lista: lista,
+        itemCount: 1,
+      );
     } else {
       return Container(
         margin: EdgeInsets.only(bottom: 10, right: 45, left: 45),
@@ -125,15 +132,14 @@ class tresParquesProxWidget extends StatelessWidget {
               'Não existem parques próximos de si',
               textAlign: TextAlign.center,
               style: TextStyle(
-              fontSize: 25,
-              color: Colors.black,
-
+                fontSize: 25,
+                color: Colors.black,
+              ),
             ),
           ),
         ),
-      ),);
-  }
-
+      );
+    } // Pass data to listaParquesPertoWidget
   }
 }
 
@@ -144,7 +150,7 @@ class listaParquesPertoWidget extends StatelessWidget {
     required this.itemCount
   });
 
-  final List<Parque> lista;
+  final List<Lote> lista;
   final int itemCount;
 
   @override
@@ -152,17 +158,25 @@ class listaParquesPertoWidget extends StatelessWidget {
     return ListView.builder(
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        lista.sort((a, b) => a.distancia.compareTo(b.distancia));
-        Parque parque = lista[index];
+        // lista.sort((a, b) => a.distancia.compareTo(b.distancia));
+        Lote lote = lista[index];
 
-        var lotAtual = parque.lotMaxima - parque.lotAtual;
+        var lotOcupada = lote.lotAtual;
+
+        if(lotOcupada < 0){
+          lotOcupada = lote.lotMaxima;
+        }
+
+        var lotAtual = lote.lotMaxima - lotOcupada;
 
         var corLotacao;
 
         if (lotAtual == 0) {
           corLotacao = Colors.red;
-        } else if (lotAtual < (parque.lotMaxima * 0.1).toInt()) {
+        } else if (lotAtual < (lote.lotMaxima * 0.1).toInt()) {
           corLotacao = Colors.amber;
+        }else if(lotAtual < 0){
+          lotAtual = lote.lotMaxima;
         } else {
           corLotacao = Colors.green;
         }
@@ -172,7 +186,7 @@ class listaParquesPertoWidget extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DetalheParque(parque: parque),
+                builder: (context) => DetalheParque(lote: lote),
               ),
             );
           },
@@ -187,32 +201,30 @@ class listaParquesPertoWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         textoParqProx(
-                          label: parque.nome,
+                          label: lote.nome,
                           tamanho: 18,
                           cor: Colors.black,
                           font: FontWeight.bold,
                         ),
-                        textoParqProx(
-                          label: parque.distancia.toString(),
-                          tamanho: 20,
-                          cor: Colors.black,
-                          font: FontWeight.bold,
-                        ),
+                        // textoParqProx(
+                        //   label: lote.distancia.toString(),
+                        //   tamanho: 20,
+                        //   cor: Colors.black,
+                        //   font: FontWeight.bold,
+                        // ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         textoParqProx(
-                          label: '${parque.preco.toStringAsFixed(2)}€/hr',
+                          label: lote.tipoParque,
                           tamanho: 14,
                           cor: Colors.black54,
                           font: FontWeight.normal,
                         ),
                         textoParqProx(
-                          label:
-                          '${parque.lotMaxima -
-                              parque.lotAtual} Lugares Vazios!',
+                          label: '${lotAtual} Lugares Vazios!',
                           tamanho: 14,
                           cor: corLotacao,
                           font: FontWeight.bold,
@@ -277,14 +289,8 @@ class miniMapaWidget extends StatelessWidget {
           child: Image.asset(
             'assets/maps_aumentado.png',
             fit: BoxFit.cover,
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.25,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.25,
+            width: MediaQuery.of(context).size.width * 0.8,
           ),
         ),
         Positioned.fill(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:proj_comp_movel/classes/Parque.dart';
 import 'package:proj_comp_movel/pages.dart';
 import 'package:provider/provider.dart';
 
+import 'classes/Lote.dart';
 import 'pages/Dashboard.dart';
 
 class MainPageViewModel extends ChangeNotifier{
@@ -16,7 +18,7 @@ class MainPageViewModel extends ChangeNotifier{
 }
 
 class MainPage extends StatefulWidget {
-  MainPage({super.key});
+  MainPage({super.key, required List<Lote> minhaListaParques});
 
   @override
   State<MainPage> createState() => _MainPageState();

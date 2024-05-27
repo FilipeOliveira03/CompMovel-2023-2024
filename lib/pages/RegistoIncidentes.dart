@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 import '../classes/Incidente.dart';
+import '../classes/Lote.dart';
 import '../classes/Parque.dart';
 import '../classes/ParquesRepository.dart';
 import '../main_page.dart';
@@ -32,25 +33,27 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
   String descricaoDetalhada = '';
 
   final List<String> listaParques = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
 
     // Obtém a lista de parques do repositório
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final minhaListaParques = context.read<ParquesRepository>().getParques();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final minhaListaParques = await context.read<ParquesRepository>().getLots();
       setState(() {
-        for (Parque parque in minhaListaParques) {
-          listaParques.add(parque.nome);
+        for (Lote lote in minhaListaParques) {
+          listaParques.add(lote.nome);
         }
+        isLoading = false;
       });
     });
   }
 
   void adicionarIncidenteAoParqueSelecionado(var minhaListaParques, Incidente incidente) {
     Parque? parqueSelecionado = minhaListaParques.firstWhere(
-      (parque) => parque.nome == nomeParque,
+          (parque) => parque.nome == nomeParque,
     );
 
     if (parqueSelecionado != null) {
@@ -67,7 +70,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
     });
   }
 
-  void _exibirPopUp() {
+  void _exibirPopUp(var minhaListaParques) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -79,8 +82,8 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => MainPage()),
-                  (route) => false,
+                  MaterialPageRoute(builder: (context) => MainPage(minhaListaParques: minhaListaParques,)),
+                      (route) => false,
                 );
               },
               child: Text('OK'),
@@ -93,8 +96,16 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
 
   @override
   Widget build(BuildContext context) {
-
-    final minhaListaParques = context.read<ParquesRepository>().getParques();
+    if (isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Formulário de Incidentes'),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -127,7 +138,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 buildDataHora(),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                buildValidacaoFormulario(minhaListaParques),
+                buildValidacaoFormulario(),
               ],
             ),
           ),
@@ -136,11 +147,13 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
     );
   }
 
-  Center buildValidacaoFormulario(var minhaListaParques) {
+  Center buildValidacaoFormulario() {
     return Center(
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {
+            final minhaListaParques = await context.read<ParquesRepository>().getLots();
+
             // Verifica se _imageFile é nulo e cria o objeto Incidente de acordo
             Incidente novoIncidente;
             if (_imageFile != null) {
@@ -167,7 +180,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
 
             _formKey.currentState!.reset();
 
-            _exibirPopUp();
+            _exibirPopUp(minhaListaParques);
           }
         },
         child: Text('Submeter'),

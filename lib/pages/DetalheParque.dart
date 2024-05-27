@@ -6,16 +6,36 @@ import 'package:proj_comp_movel/pages/Mapa.dart';
 import 'package:proj_comp_movel/pages/RegistoIncidentes.dart';
 import 'package:provider/provider.dart';
 
+import '../classes/Lote.dart';
 import '../classes/Parque.dart';
+import '../classes/ParquesRepository.dart';
+import '../classes/Tarifa.dart';
+import '../classes/Zone.dart';
 import '../pages.dart';
 
-class DetalheParque extends StatelessWidget {
-  final Parque parque;
+class DetalheParque extends StatefulWidget {
+  final Lote lote;
 
-  const DetalheParque({Key? key, required this.parque});
+  const DetalheParque({Key? key, required this.lote});
+
+  @override
+  State<DetalheParque> createState() => _DetalheParqueState();
+}
+
+class _DetalheParqueState extends State<DetalheParque> {
+
+  Zone? zona;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+
     var barra = Divider(
       height: 20,
       thickness: 2,
@@ -24,72 +44,111 @@ class DetalheParque extends StatelessWidget {
       endIndent: 20,
     );
 
-    Color corDisponibilidade;
+    Color corDisponibilidade = Colors.white10;
 
-    switch (parque.disponibilidade) {
-      case DISPONIBILIDADE.DISPONIVEL:
-        corDisponibilidade = Colors.green;
-        break;
-      case DISPONIBILIDADE.PARCIALMENTE_LOTADO:
-        corDisponibilidade = Colors.amber;
-        break;
-      case DISPONIBILIDADE.QUASE_LOTADO:
-        corDisponibilidade = Colors.redAccent;
-        break;
-      case DISPONIBILIDADE.LOTADO:
-        corDisponibilidade = Colors.red.shade900;
-        break;
-    }
+    // switch (parque.disponibilidade) {
+    //   case DISPONIBILIDADE.DISPONIVEL:
+    //     corDisponibilidade = Colors.green;
+    //     break;
+    //   case DISPONIBILIDADE.PARCIALMENTE_LOTADO:
+    //     corDisponibilidade = Colors.amber;
+    //     break;
+    //   case DISPONIBILIDADE.QUASE_LOTADO:
+    //     corDisponibilidade = Colors.redAccent;
+    //     break;
+    //   case DISPONIBILIDADE.LOTADO:
+    //     corDisponibilidade = Colors.red.shade900;
+    //     break;
+    // }
 
     Color preto = Colors.black;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(parque.nome),
+        title: Text(widget.lote.nome),
       ),
       body: DefaultTextStyle(
         style: TextStyle(
           fontSize: 18,
           color: Colors.black,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            informacaoParque(
-              parque: parque,
-              barra: barra,
-              corDisponibilidade: corDisponibilidade,
-              preto: preto,
-            ),
-            barra,
-            Expanded(
-              child: incidentesReportados(parque: parque),
-            ),
-            barra,
-            butoesBaixo(),
-          ],
-        ),
+        child: FutureBuilder(
+          future: parquesRepository.getPlaces(widget.lote.id),
+          builder: (_, snapshot){
+
+            if(snapshot.connectionState != ConnectionState.done){
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }else{
+              if(snapshot.hasError){
+                return Text('Error');
+              }else{
+                return buildDetails(snapshot.data!, barra, corDisponibilidade, preto);
+              }
+            }
+          },
+        )
       ),
     );
   }
+
+  Widget buildDetails(Zone zona, Divider barra, Color corDisponibilidade, Color preto) {
+    return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              informacaoParque(
+                lote: widget.lote,
+                zona: zona,
+                barra: barra,
+                corDisponibilidade: corDisponibilidade,
+                preto: preto,
+              ),
+              barra,
+              Expanded(
+                child: incidentesReportados(lote: widget.lote),
+              ),
+              barra,
+              butoesBaixo(),
+            ],
+          );
+  }
 }
 
-class informacaoParque extends StatelessWidget {
+
+class informacaoParque extends StatefulWidget {
   const informacaoParque({
     Key? key,
-    required this.parque,
+    required this.lote,
+    required this.zona,
     required this.barra,
     required this.corDisponibilidade,
     required this.preto,
   }) : super(key: key);
 
-  final Parque parque;
+  final Lote lote;
+  final Zone? zona;
   final Divider barra;
   final Color corDisponibilidade;
   final Color preto;
 
   @override
+  State<informacaoParque> createState() => _informacaoParqueState();
+}
+
+class _informacaoParqueState extends State<informacaoParque> {
+
+  @override
   Widget build(BuildContext context) {
+
+    var tarifa = Tarifas().tarifas.firstWhere((element) => element.cor.toLowerCase() == widget.zona!.tarifa.toLowerCase());
+
+    var lotAtual = widget.lote.lotAtual;
+
+    if(lotAtual < 0){
+      lotAtual = widget.lote.lotMaxima;
+    }
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.48,
       child: Column(
@@ -113,9 +172,9 @@ class informacaoParque extends StatelessWidget {
                 ),
               ],
             ),
-            child: parque.assertImagem != null
+            child: widget.lote.assertImagem != null
                 ? Image.asset(
-                    parque.assertImagem!,
+                    widget.lote.assertImagem!,
                     width: 350,
                     height: 350,
                     fit: BoxFit.cover,
@@ -128,38 +187,37 @@ class informacaoParque extends StatelessWidget {
                   ),
           ),
           SizedBox(height: 10),
-          barra,
-          textoDistancia(parque: parque),
+          widget.barra,
+          textoDistancia(zone: widget.zona, lote: widget.lote,),
           textoInformacoes(
-            textoNegrito: 'Disponibilidade: ',
-            textoNormal: parque.disponibilidade.string,
-            cor: corDisponibilidade,
+            textoNegrito: 'Horário: ',
+            textoNormal: widget.zona!.horarioespecifico.toLowerCase(),
+            cor: widget.preto,
           ),
           textoInformacoes(
             textoNegrito: 'Lotação: ',
-            textoNormal: '${parque.lotAtual}/${parque.lotMaxima}',
-            cor: preto,
-          ),
-          textoInformacoes(
-            textoNegrito: 'Horário: ',
-            textoNormal:
-                '${parque.horarioAbertura.hour}:${parque.horarioAbertura.minute.toString().padLeft(2, '0')} - ${parque.horarioFecho.hour}:${parque.horarioFecho.minute.toString().padLeft(2, '0')}',
-            cor: preto,
-          ),
-          textoInformacoes(
-            textoNegrito: 'Preço p/hora: ',
-            textoNormal: '${parque.preco.toStringAsFixed(2)}€',
-            cor: preto,
+            textoNormal: '$lotAtual/${widget.lote.lotMaxima}',
+            cor: widget.preto,
           ),
           textoInformacoes(
             textoNegrito: 'Tipo de Parque: ',
-            textoNormal: parque.tipoParque.string,
-            cor: preto,
+            textoNormal: widget.lote.tipoParque,
+            cor: widget.preto,
           ),
           textoInformacoes(
-            textoNegrito: 'Morada: ',
-            textoNormal: parque.morada,
-            cor: preto,
+            textoNegrito: 'Tarifa: ',
+            textoNormal: tarifa.cor,
+            cor: widget.preto,
+          ),
+          textoInformacoes(
+            textoNegrito: 'Preço p/hora: ',
+            textoNormal: '${tarifa.preco.toString()}€',
+            cor: widget.preto,
+          ),
+          textoInformacoes(
+            textoNegrito: 'Duração máxima permitida: ',
+            textoNormal: '${tarifa.duracaoMax.toString()} horas',
+            cor: widget.preto,
           ),
         ],
       ),
@@ -167,24 +225,31 @@ class informacaoParque extends StatelessWidget {
   }
 }
 
-class textoDistancia extends StatelessWidget {
+class textoDistancia extends StatefulWidget {
   const textoDistancia({
     Key? key,
-    required this.parque,
+    required this.lote,
+    required this.zone,
   }) : super(key: key);
 
-  final Parque parque;
+  final Lote lote;
+  final Zone? zone;
 
+  @override
+  State<textoDistancia> createState() => _textoDistanciaState();
+}
+
+class _textoDistanciaState extends State<textoDistancia> {
   @override
   Widget build(BuildContext context) {
     var textoDistancia = '';
 
-    if (parque.distancia.toString().length > 3) {
-      textoDistancia =
-          '${parque.distancia ~/ 1000}.${(parque.distancia ~/ 100) % 10} km ';
-    } else {
-      textoDistancia = '${parque.distancia} m ';
-    }
+    // if (widget.parque.distancia.toString().length > 3) {
+    //   textoDistancia =
+    //       '${widget.parque.distancia ~/ 1000}.${(widget.parque.distancia ~/ 100) % 10} km ';
+    // } else {
+    //   textoDistancia = '${widget.parque.distancia} m ';
+    // }
 
     return RichText(
       text: TextSpan(
@@ -213,7 +278,7 @@ class textoDistancia extends StatelessWidget {
   }
 }
 
-class textoInformacoes extends StatelessWidget {
+class textoInformacoes extends StatefulWidget {
   const textoInformacoes({
     Key? key,
     required this.textoNegrito,
@@ -226,6 +291,11 @@ class textoInformacoes extends StatelessWidget {
   final Color cor;
 
   @override
+  State<textoInformacoes> createState() => _textoInformacoesState();
+}
+
+class _textoInformacoesState extends State<textoInformacoes> {
+  @override
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
@@ -236,13 +306,13 @@ class textoInformacoes extends StatelessWidget {
         ),
         children: <TextSpan>[
           TextSpan(
-            text: textoNegrito,
+            text: widget.textoNegrito,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           TextSpan(
-            text: textoNormal,
+            text: widget.textoNormal,
             style: TextStyle(
-              color: cor,
+              color: widget.cor,
             ),
           ),
         ],
@@ -251,9 +321,14 @@ class textoInformacoes extends StatelessWidget {
   }
 }
 
-class butoesBaixo extends StatelessWidget {
+class butoesBaixo extends StatefulWidget {
   const butoesBaixo({Key? key}) : super(key: key);
 
+  @override
+  State<butoesBaixo> createState() => _butoesBaixoState();
+}
+
+class _butoesBaixoState extends State<butoesBaixo> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -293,17 +368,22 @@ class butoesBaixo extends StatelessWidget {
   }
 }
 
-class incidentesReportados extends StatelessWidget {
+class incidentesReportados extends StatefulWidget {
   const incidentesReportados({
     Key? key,
-    required this.parque,
+    required this.lote,
   }) : super(key: key);
 
-  final Parque parque;
+  final Lote lote;
 
   @override
+  State<incidentesReportados> createState() => _incidentesReportadosState();
+}
+
+class _incidentesReportadosState extends State<incidentesReportados> {
+  @override
   Widget build(BuildContext context) {
-    if (parque.incidentes.isEmpty) {
+    if (widget.lote.incidentes.isEmpty) {
       return Container(
         height: MediaQuery.of(context).size.height * 0.15,
         child: Column(
@@ -316,7 +396,7 @@ class incidentesReportados extends StatelessWidget {
       height: MediaQuery.of(context).size.height * 0.15,
       child: ListView.builder(
         physics: ClampingScrollPhysics(),
-        itemCount: parque.incidentes.length,
+        itemCount: widget.lote.incidentes.length,
         itemBuilder: (context, index) {
           return Card(
             child: ListTile(
@@ -331,14 +411,14 @@ class incidentesReportados extends StatelessWidget {
                           child: Column(
                             children: [
                               Text(
-                                parque.incidentes[index].tituloCurto,
+                                widget.lote.incidentes[index].tituloCurto,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 26,
                                 ),
                               ),
                               Text(
-                                'Gravidade: ${parque.incidentes[index].gravidade}',
+                                'Gravidade: ${widget.lote.incidentes[index].gravidade}',
                                 style: TextStyle(
                                   fontSize: 16,
                                 ),
@@ -354,7 +434,7 @@ class incidentesReportados extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    parque.incidentes[index].descricaoDetalhada,
+                                    widget.lote.incidentes[index].descricaoDetalhada,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 16,
@@ -365,7 +445,7 @@ class incidentesReportados extends StatelessWidget {
                               SizedBox(
                                 height: 10,
                               ),
-                              if (parque.incidentes[index].imagem != null)
+                              if (widget.lote.incidentes[index].imagem != null)
                                 Container(
                                   width: 200,
                                   height: 180,
@@ -385,18 +465,18 @@ class incidentesReportados extends StatelessWidget {
                                   ),
                                   child: Image(
                                     image: XFileImage(
-                                        parque.incidentes[index].imagem!),
+                                        widget.lote.incidentes[index].imagem!),
                                     width: 150,
                                     height: 150,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                              if (parque.incidentes[index].imagem != null)
+                              if (widget.lote.incidentes[index].imagem != null)
                                 SizedBox(
                                   height: 8,
                                 ),
                               Text(
-                                '${parque.incidentes[index].data.day}/${parque.incidentes[index].data.month}/${parque.incidentes[index].data.year} ${parque.incidentes[index].data.hour.toString().padLeft(2, '0')}:${parque.incidentes[index].data.minute.toString().padLeft(2, '0')}',
+                                '${widget.lote.incidentes[index].data.day}/${widget.lote.incidentes[index].data.month}/${widget.lote.incidentes[index].data.year} ${widget.lote.incidentes[index].data.hour.toString().padLeft(2, '0')}:${widget.lote.incidentes[index].data.minute.toString().padLeft(2, '0')}',
                                 style: TextStyle(
                                   fontSize: 16,
                                 ),
@@ -431,14 +511,14 @@ class incidentesReportados extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        parque.incidentes[index].tituloCurto,
+                        widget.lote.incidentes[index].tituloCurto,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                       Text(
-                        'Gravidade: ${parque.incidentes[index].gravidade}',
+                        'Gravidade: ${widget.lote.incidentes[index].gravidade}',
                         style: TextStyle(
                           fontSize: 14,
                         ),
@@ -449,7 +529,7 @@ class incidentesReportados extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '${parque.incidentes[index].data.day}/${parque.incidentes[index].data.month}/${parque.incidentes[index].data.year} ${parque.incidentes[index].data.hour.toString().padLeft(2, '0')}:${parque.incidentes[index].data.minute.toString().padLeft(2, '0')}',
+                        '${widget.lote.incidentes[index].data.day}/${widget.lote.incidentes[index].data.month}/${widget.lote.incidentes[index].data.year} ${widget.lote.incidentes[index].data.hour.toString().padLeft(2, '0')}:${widget.lote.incidentes[index].data.minute.toString().padLeft(2, '0')}',
                         style: TextStyle(
                           fontSize: 14,
                         ),
