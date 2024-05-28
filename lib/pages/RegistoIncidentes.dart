@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:proj_comp_movel/data/parquesDatabase.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -32,7 +33,9 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
   TextEditingController descricaoController = TextEditingController();
   String descricaoDetalhada = '';
 
+
   final List<String> listaParques = [];
+  final Map<String,String> listaParquesComId = <String,String>{};
   bool isLoading = true;
 
   @override
@@ -45,6 +48,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
       setState(() {
         for (Lote lote in minhaListaParques) {
           listaParques.add(lote.nome);
+          listaParquesComId[lote.nome] = lote.id;
         }
         isLoading = false;
       });
@@ -52,7 +56,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
   }
 
   void adicionarIncidenteAoParqueSelecionado(var minhaListaParques, Incidente incidente) {
-    Parque? parqueSelecionado = minhaListaParques.firstWhere(
+    Lote? parqueSelecionado = minhaListaParques.firstWhere(
           (parque) => parque.nome == nomeParque,
     );
 
@@ -132,8 +136,6 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 buildDescricaoDetalhadaText(),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                buildSelecionarImagem(),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 buildGravidadeIncidente(context),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                 buildDataHora(),
@@ -148,35 +150,29 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
   }
 
   Center buildValidacaoFormulario() {
+
+    final database = context.read<ParquesDatabase>();
+
     return Center(
       child: ElevatedButton(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             final minhaListaParques = await context.read<ParquesRepository>().getLots();
-
+            var idParque = listaParquesComId[nomeParque];
             // Verifica se _imageFile é nulo e cria o objeto Incidente de acordo
-            Incidente novoIncidente;
-            if (_imageFile != null) {
-              novoIncidente = Incidente(
-                nomeParque!,
-                tituloCurto!,
-                data,
-                descricaoDetalhada,
-                gravidade.toInt(),
-                _imageFile!,
-              );
-            } else {
-              novoIncidente = Incidente(
-                nomeParque!,
-                tituloCurto!,
-                data,
-                descricaoDetalhada,
-                gravidade.toInt(),
-                null, // ou outro valor que indique que não há imagem
-              );
-            }
+            Incidente novoIncidente = Incidente(
+              idParque!,
+              nomeParque!,
+              tituloCurto!,
+              data,
+              descricaoDetalhada,
+              gravidade.toInt(),
+            );
+
 
             adicionarIncidenteAoParqueSelecionado(minhaListaParques, novoIncidente);
+
+            database.insertIncidente(novoIncidente);
 
             _formKey.currentState!.reset();
 
@@ -265,27 +261,6 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
           ),
           SizedBox(height: 10),
         ],
-      ),
-    );
-  }
-
-  GestureDetector buildSelecionarImagem() {
-    return GestureDetector(
-      onTap: _pickImage,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black54),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        padding: EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.camera_alt),
-            SizedBox(width: 8.0),
-            Text('Selecionar Imagem'),
-          ],
-        ),
       ),
     );
   }

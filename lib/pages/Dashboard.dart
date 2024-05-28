@@ -100,46 +100,63 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
   Future<void> fetchData() async {
     final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
     minhaListaParques = await parquesRepository.getLots();
-    setState(() {}); // Ensure the UI updates after fetching data
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    var lista = List<Lote>.from(minhaListaParques);
+    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    return FutureBuilder(
+      future: parquesRepository.getLots(),
+      builder: (_, snapshot){
 
-    if (lista.length >= 3) {
-      return listaParquesPertoWidget(
-        lista: lista,
-        itemCount: 3,
-      );
-    } else if (lista.length == 2) {
-      return listaParquesPertoWidget(
-        lista: lista,
-        itemCount: 2,
-      );
-    } else if (lista.length == 1) {
-      return listaParquesPertoWidget(
-        lista: lista,
-        itemCount: 1,
-      );
-    } else {
-      return Container(
-        margin: EdgeInsets.only(bottom: 10, right: 45, left: 45),
-        child: Padding(
-          padding: EdgeInsets.all(10),
-          child: Center(
-            child: Text(
-              'Não existem parques próximos de si',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 25,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        ),
-      );
-    } // Pass data to listaParquesPertoWidget
+        if(snapshot.connectionState != ConnectionState.done){
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }else{
+          if(snapshot.hasError){
+            return Text('Error');
+          }else{
+            var lista = List<Lote>.from(minhaListaParques);
+
+            if (lista.length >= 3) {
+              return listaParquesPertoWidget(
+                lista: lista,
+                itemCount: 3,
+              );
+            } else if (lista.length == 2) {
+              return listaParquesPertoWidget(
+                lista: lista,
+                itemCount: 2,
+              );
+            } else if (lista.length == 1) {
+              return listaParquesPertoWidget(
+                lista: lista,
+                itemCount: 1,
+              );
+            } else {
+              return Container(
+                margin: EdgeInsets.only(bottom: 10, right: 45, left: 45),
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Center(
+                    child: Text(
+                      'Não existem parques próximos de si',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+        }
+      },
+    );
   }
 }
 

@@ -23,9 +23,27 @@ class Lote {
     required this.tipoParque,
   });
 
-  factory Lote.fromMap(Map<String, dynamic> map){
-    return Lote(id: map['id_parque'], nome: map['nome'], lotAtual: map['ocupacao'], lotMaxima: map['capacidade_max'], dataAtualizacao: map['data_ocupacao'], latitude: map['latitude'], longitude: map['longitude'], tipoParque: map['tipo']);
+  factory Lote.fromJSON(Map<String, dynamic> map) {
+    return Lote(
+        id: map['id_parque'],
+        nome: map['nome'],
+        lotAtual: map['ocupacao'],
+        lotMaxima: map['capacidade_max'],
+        dataAtualizacao: map['data_ocupacao'],
+        latitude: map['latitude'],
+        longitude: map['longitude'],
+        tipoParque: map['tipo']);
   }
 
-
+  factory Lote.fromDB(Map<String, dynamic> db) {
+    return Lote(
+        id: db['id_parque'],
+        nome: db['nome'],
+        lotAtual: db['ocupacao'],
+        lotMaxima: db['capacidade_max'],
+        dataAtualizacao: db['data_ocupacao'],
+        latitude: db['latitude'],
+        longitude: db['longitude'],
+        tipoParque: db['tipo']);
+  }
 }

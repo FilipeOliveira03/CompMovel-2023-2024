@@ -38,6 +38,8 @@ dependencies:
   cross_file_image: ^1.1.0
   http: ^1.2.0
   provider: ^6.1.1
+  sqflite: ^2.3.2
+  path: ^1.8.3
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -450,36 +450,36 @@ class _incidentesReportadosState extends State<incidentesReportados> {
                               SizedBox(
                                 height: 10,
                               ),
-                              if (widget.lote.incidentes[index].imagem != null)
-                                Container(
-                                  width: 200,
-                                  height: 180,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 1.2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 5,
-                                        blurRadius: 7,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Image(
-                                    image: XFileImage(
-                                        widget.lote.incidentes[index].imagem!),
-                                    width: 150,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              if (widget.lote.incidentes[index].imagem != null)
-                                SizedBox(
-                                  height: 8,
-                                ),
+                              // if (widget.lote.incidentes[index].imagem != null)
+                              //   Container(
+                              //     width: 200,
+                              //     height: 180,
+                              //     decoration: BoxDecoration(
+                              //       border: Border.all(
+                              //         color: Colors.black,
+                              //         width: 1.2,
+                              //       ),
+                              //       boxShadow: [
+                              //         BoxShadow(
+                              //           color: Colors.grey.withOpacity(0.5),
+                              //           spreadRadius: 5,
+                              //           blurRadius: 7,
+                              //           offset: Offset(0, 3),
+                              //         ),
+                              //       ],
+                              //     ),
+                              //     child: Image(
+                              //       image: XFileImage(
+                              //           widget.lote.incidentes[index].imagem!),
+                              //       width: 150,
+                              //       height: 150,
+                              //       fit: BoxFit.cover,
+                              //     ),
+                              //   ),
+                              // if (widget.lote.incidentes[index].imagem != null)
+                              //   SizedBox(
+                              //     height: 8,
+                              //   ),
                               Text(
                                 '${widget.lote.incidentes[index].data.day}/${widget.lote.incidentes[index].data.month}/${widget.lote.incidentes[index].data.year} ${widget.lote.incidentes[index].data.hour.toString().padLeft(2, '0')}:${widget.lote.incidentes[index].data.minute.toString().padLeft(2, '0')}',
                                 style: TextStyle(
