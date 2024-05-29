@@ -161,12 +161,12 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
             var idParque = listaParquesComId[nomeParque];
             // Verifica se _imageFile é nulo e cria o objeto Incidente de acordo
             Incidente novoIncidente = Incidente(
-              idParque!,
-              nomeParque!,
-              tituloCurto!,
-              data,
-              descricaoDetalhada,
-              gravidade.toInt(),
+              idParque: idParque!,
+              nomeParque: nomeParque!,
+              tituloCurto:  tituloCurto!,
+              data: data,
+              descricaoDetalhada: descricaoDetalhada,
+              gravidade: gravidade.toInt(),
             );
 
 
