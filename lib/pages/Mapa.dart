@@ -80,8 +80,7 @@ class _MapaState extends State<Mapa> {
       body: _currentP == null
           ? const Center(
         child: Text("Loading..."),
-      )
-          : GoogleMap(
+      ) : GoogleMap(
         onMapCreated: (GoogleMapController controller) => _mapController.complete(controller),
         initialCameraPosition: CameraPosition(
           target: _pGooglePlex,
