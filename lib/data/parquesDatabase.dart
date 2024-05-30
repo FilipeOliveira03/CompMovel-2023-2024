@@ -62,4 +62,14 @@ class ParquesDatabase {
 
   }
 
+  Future<List<Incidente>> getIncidentes(String idParque) async {
+    if (_database == null) {
+      throw Exception('DB not initialized');
+    }
+
+    List result = await _database!.rawQuery("SELECT * FROM Incidente WHERE idParque = '$idParque'");
+
+    return result.map((entry) => Incidente.fromDB(entry)).toList();
+  }
+
 }

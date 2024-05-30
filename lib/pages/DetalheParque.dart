@@ -11,6 +11,7 @@ import '../classes/Parque.dart';
 import '../classes/ParquesRepository.dart';
 import '../classes/Tarifa.dart';
 import '../classes/Zone.dart';
+import '../data/parquesDatabase.dart';
 import '../pages.dart';
 
 class DetalheParque extends StatefulWidget {
@@ -23,7 +24,6 @@ class DetalheParque extends StatefulWidget {
 }
 
 class _DetalheParqueState extends State<DetalheParque> {
-
   Zone? zona;
 
   @override
@@ -33,8 +33,8 @@ class _DetalheParqueState extends State<DetalheParque> {
 
   @override
   Widget build(BuildContext context) {
-
-    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    final parquesRepository =
+        Provider.of<ParquesRepository>(context, listen: false);
 
     var barra = Divider(
       height: 20,
@@ -68,53 +68,52 @@ class _DetalheParqueState extends State<DetalheParque> {
         title: Text(widget.lote.nome),
       ),
       body: DefaultTextStyle(
-        style: TextStyle(
-          fontSize: 18,
-          color: Colors.black,
-        ),
-        child: FutureBuilder(
-          future: parquesRepository.getPlaces(widget.lote.id),
-          builder: (_, snapshot){
-
-            if(snapshot.connectionState != ConnectionState.done){
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }else{
-              if(snapshot.hasError){
-                return Text('Error');
-              }else{
-                return buildDetails(snapshot.data!, barra, corDisponibilidade, preto);
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.black,
+          ),
+          child: FutureBuilder(
+            future: parquesRepository.getPlaces(widget.lote.id),
+            builder: (_, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                if (snapshot.hasError) {
+                  return Text('Error');
+                } else {
+                  return buildDetails(
+                      snapshot.data!, barra, corDisponibilidade, preto);
+                }
               }
-            }
-          },
-        )
-      ),
+            },
+          )),
     );
   }
 
-  Widget buildDetails(Zone zona, Divider barra, Color corDisponibilidade, Color preto) {
+  Widget buildDetails(
+      Zone zona, Divider barra, Color corDisponibilidade, Color preto) {
     return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              informacaoParque(
-                lote: widget.lote,
-                zona: zona,
-                barra: barra,
-                corDisponibilidade: corDisponibilidade,
-                preto: preto,
-              ),
-              barra,
-              Expanded(
-                child: incidentesReportados(lote: widget.lote),
-              ),
-              barra,
-              butoesBaixo(),
-            ],
-          );
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        informacaoParque(
+          lote: widget.lote,
+          zona: zona,
+          barra: barra,
+          corDisponibilidade: corDisponibilidade,
+          preto: preto,
+        ),
+        barra,
+        Expanded(
+          child: incidentesReportados(lote: widget.lote),
+        ),
+        barra,
+        butoesBaixo(),
+      ],
+    );
   }
 }
-
 
 class informacaoParque extends StatefulWidget {
   const informacaoParque({
@@ -137,15 +136,14 @@ class informacaoParque extends StatefulWidget {
 }
 
 class _informacaoParqueState extends State<informacaoParque> {
-
   @override
   Widget build(BuildContext context) {
-
-    var tarifa = Tarifas().tarifas.firstWhere((element) => element.cor.toLowerCase() == widget.zona!.tarifa.toLowerCase());
+    var tarifa = Tarifas().tarifas.firstWhere((element) =>
+        element.cor.toLowerCase() == widget.zona!.tarifa.toLowerCase());
 
     var lotAtual = widget.lote.lotAtual;
 
-    if(lotAtual < 0){
+    if (lotAtual < 0) {
       lotAtual = widget.lote.lotMaxima;
     }
 
@@ -188,7 +186,10 @@ class _informacaoParqueState extends State<informacaoParque> {
           ),
           SizedBox(height: 10),
           widget.barra,
-          textoDistancia(zone: widget.zona, lote: widget.lote,),
+          textoDistancia(
+            zone: widget.zona,
+            lote: widget.lote,
+          ),
           textoInformacoes(
             textoNegrito: 'Horário: ',
             textoNormal: widget.zona!.horarioespecifico.toLowerCase(),
@@ -388,7 +389,34 @@ class incidentesReportados extends StatefulWidget {
 class _incidentesReportadosState extends State<incidentesReportados> {
   @override
   Widget build(BuildContext context) {
-    if (widget.lote.incidentes.isEmpty) {
+    final database = context.read<ParquesDatabase>();
+
+    final incidentes = database.getIncidentes(widget.lote.id);
+    print(incidentes);
+    return FutureBuilder(
+        future: database.getIncidentes(widget.lote.id),
+        builder: (_, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('${snapshot.error}'),
+              );
+            } else {
+              return builderIncidentes(snapshot.data ?? [], context);
+            }
+          }
+        });
+  }
+
+  Widget builderIncidentes(List<Incidente> incidentes, BuildContext context) {
+
+
+
+    if (incidentes.isEmpty) {
       return Container(
         height: MediaQuery.of(context).size.height * 0.15,
         child: Column(
@@ -396,157 +424,137 @@ class _incidentesReportadosState extends State<incidentesReportados> {
           children: [Text('Não foram reportados incidentes')],
         ),
       );
-    }
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.15,
-      child: ListView.builder(
-        physics: ClampingScrollPhysics(),
-        itemCount: widget.lote.incidentes.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return IntrinsicHeight(
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Text(
-                                widget.lote.incidentes[index].tituloCurto,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 26,
-                                ),
-                              ),
-                              Text(
-                                'Gravidade: ${widget.lote.incidentes[index].gravidade}',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Descrição do incidente:',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+    } else {
+      return Container(
+        height: MediaQuery.of(context).size.height * 0.15,
+        child: ListView.builder(
+          physics: ClampingScrollPhysics(),
+          itemCount: incidentes.length,
+          itemBuilder: (context, index) {
+            return Card(
+              child: ListTile(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+
+                      var descricao;
+
+                      if (incidentes[index].descricaoDetalhada == ''){
+                        descricao = 'Não existe informação adicional';
+                      }else{
+                        descricao = incidentes[index].descricaoDetalhada;
+                      }
+
+                      return IntrinsicHeight(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  incidentes[index].tituloCurto,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 26,
                                   ),
-                                  Text(
-                                    widget.lote.incidentes[index].descricaoDetalhada,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
+                                ),
+                                Text(
+                                  'Gravidade: ${incidentes[index].gravidade}',
+                                  style: TextStyle(
+                                    fontSize: 16,
                                   ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              // if (widget.lote.incidentes[index].imagem != null)
-                              //   Container(
-                              //     width: 200,
-                              //     height: 180,
-                              //     decoration: BoxDecoration(
-                              //       border: Border.all(
-                              //         color: Colors.black,
-                              //         width: 1.2,
-                              //       ),
-                              //       boxShadow: [
-                              //         BoxShadow(
-                              //           color: Colors.grey.withOpacity(0.5),
-                              //           spreadRadius: 5,
-                              //           blurRadius: 7,
-                              //           offset: Offset(0, 3),
-                              //         ),
-                              //       ],
-                              //     ),
-                              //     child: Image(
-                              //       image: XFileImage(
-                              //           widget.lote.incidentes[index].imagem!),
-                              //       width: 150,
-                              //       height: 150,
-                              //       fit: BoxFit.cover,
-                              //     ),
-                              //   ),
-                              // if (widget.lote.incidentes[index].imagem != null)
-                              //   SizedBox(
-                              //     height: 8,
-                              //   ),
-                              Text(
-                                '${widget.lote.incidentes[index].data.day}/${widget.lote.incidentes[index].data.month}/${widget.lote.incidentes[index].data.year} ${widget.lote.incidentes[index].data.hour.toString().padLeft(2, '0')}:${widget.lote.incidentes[index].data.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(
-                                  fontSize: 16,
                                 ),
-                              ),
-                              SizedBox(
-                                height: 4,
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Descrição do incidente:',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      descricao,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                child: Text(
-                                  'Fechar',
-                                  style: TextStyle(color: Colors.black),
+                                SizedBox(
+                                  height: 10,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  '${incidentes[index].data.day}/${incidentes[index].data.month}/${incidentes[index].data.year} ${incidentes[index].data.hour.toString().padLeft(2, '0')}:${incidentes[index].data.minute.toString().padLeft(2, '0')}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                  child: Text(
+                                    'Fechar',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.lote.incidentes[index].tituloCurto,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      );
+                    },
+                  );
+                },
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          incidentes[index].tituloCurto,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Gravidade: ${widget.lote.incidentes[index].gravidade}',
-                        style: TextStyle(
-                          fontSize: 14,
+                        Text(
+                          'Gravidade: ${incidentes[index].gravidade}',
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '${widget.lote.incidentes[index].data.day}/${widget.lote.incidentes[index].data.month}/${widget.lote.incidentes[index].data.year} ${widget.lote.incidentes[index].data.hour.toString().padLeft(2, '0')}:${widget.lote.incidentes[index].data.minute.toString().padLeft(2, '0')}',
-                        style: TextStyle(
-                          fontSize: 14,
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${incidentes[index].data.day}/${incidentes[index].data.month}/${incidentes[index].data.year} ${incidentes[index].data.hour.toString().padLeft(2, '0')}:${incidentes[index].data.minute.toString().padLeft(2, '0')}',
+                          style: TextStyle(
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-                ],
+                      ],
+                    )
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      ),
-    );
+            );
+          },
+        ),
+      );
+    }
   }
 }
