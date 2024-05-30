@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../classes/Lote.dart';
 import '../classes/ParquesRepository.dart';
+import 'DetalheParque.dart';
 
 class Mapa extends StatefulWidget {
   const Mapa({super.key});
@@ -21,7 +22,6 @@ class _MapaState extends State<Mapa> {
   final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
 
   static const LatLng _pGooglePlex = LatLng(37.4223, -122.0848);
-  static const LatLng _pApplePark = LatLng(37.3346, -122.0090);
   LatLng? _currentP = null;
 
   Set<Marker> _markers = {};
@@ -58,12 +58,21 @@ class _MapaState extends State<Mapa> {
           infoWindow: InfoWindow(
             title: parque.nome,
           ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetalheParque(lote: parque),
+              ),
+            );
+          },
         ),
       );
     }
 
     _markers = newMarkers;
   }
+
 
   @override
   Widget build(BuildContext context) {

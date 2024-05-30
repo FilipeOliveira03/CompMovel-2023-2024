@@ -92,7 +92,7 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
   @override
   void initState() {
     super.initState();
-    fetchData(); // Fetch data in initState
+    fetchData();
   }
 
   Future<void> fetchData() async {
