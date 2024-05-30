@@ -5,9 +5,7 @@ import 'package:proj_comp_movel/pages.dart';
 import 'package:provider/provider.dart';
 
 import '../classes/Lote.dart';
-import '../classes/Parque.dart';
 import '../classes/ParquesRepository.dart';
-import '../main.dart';
 import 'DetalheParque.dart';
 
 class Dashboard extends StatelessWidget {
@@ -89,7 +87,7 @@ class tresParquesProxWidget extends StatefulWidget {
 }
 
 class _tresParquesProxState extends State<tresParquesProxWidget> {
-  List<Lote> minhaListaParques = []; // Initialize an empty list
+  List<Lote> minhaListaParques = [];
 
   @override
   void initState() {
