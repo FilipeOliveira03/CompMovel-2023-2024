@@ -48,6 +48,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   anim_search_bar: ^2.0.2
   google_maps_flutter: ^2.6.1
+  geolocator: ^9.0.2
   location: ^6.0.2
 
 dev_dependencies:

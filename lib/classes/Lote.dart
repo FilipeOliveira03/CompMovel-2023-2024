@@ -9,6 +9,7 @@ class Lote {
   String latitude;
   String longitude;
   String tipoParque;
+  double? distancia;
   String? assertImagem;
   List<Incidente> incidentes = [];
 
