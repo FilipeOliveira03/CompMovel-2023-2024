@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import '../classes/Lote.dart';
 import '../classes/ParquesRepository.dart';
 import 'DetalheParque.dart';
+import 'Mapa.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});
@@ -90,7 +91,11 @@ class Dashboard extends StatelessWidget {
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.02,
             ),
-            miniMapaWidget(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.25,
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Mapa(),
+            ),
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.02,
             ),
@@ -331,41 +336,6 @@ class textoParqProx extends StatelessWidget {
         color: cor,
         fontWeight: font,
       ),
-    );
-  }
-}
-
-class miniMapaWidget extends StatelessWidget {
-  const miniMapaWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Image.asset(
-            'assets/maps_aumentado.png',
-            fit: BoxFit.cover,
-            height: MediaQuery.of(context).size.height * 0.25,
-            width: MediaQuery.of(context).size.width * 0.8,
-          ),
-        ),
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                width: 1,
-                color: Colors.black.withOpacity(0.3),
-                style: BorderStyle.solid,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

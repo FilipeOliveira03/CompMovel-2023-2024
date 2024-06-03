@@ -79,7 +79,7 @@ class _MapaState extends State<Mapa> {
     return Scaffold(
       body: _currentP == null
           ? const Center(
-        child: Text("Loading..."),
+        child: CircularProgressIndicator(),
       ) : GoogleMap(
         onMapCreated: (GoogleMapController controller) => _mapController.complete(controller),
         initialCameraPosition: CameraPosition(
