@@ -168,8 +168,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
               descricaoDetalhada: descricaoDetalhada,
               gravidade: gravidade.toInt(),
             );
-
-
+            
             adicionarIncidenteAoParqueSelecionado(minhaListaParques, novoIncidente);
 
             database.insertIncidente(novoIncidente);

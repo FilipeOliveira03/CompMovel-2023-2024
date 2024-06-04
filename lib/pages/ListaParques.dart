@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proj_comp_movel/data/parquesDatabase.dart';
 import 'package:proj_comp_movel/pages/DetalheParque.dart';
 import 'package:provider/provider.dart';
 import '../classes/Lote.dart';
@@ -14,24 +15,12 @@ class ListaParques extends StatefulWidget {
 }
 
 class _ListaParquesState extends State<ListaParques> {
-  List<Lote> listaLots = [];
   bool ordenarPorDistanciaCrescente = true;
-  bool isLoading = true;
+
 
   @override
   void initState() {
     super.initState();
-    _carregarParques();
-  }
-
-  Future<void> _carregarParques() async {
-    final minhaListaParques =
-        await context.read<ParquesRepository>().getLots();
-
-    setState(() {
-      listaLots = minhaListaParques;
-      isLoading = false;
-    });
   }
 
   void ordenarParquesPorDistancia() {
@@ -46,17 +35,31 @@ class _ListaParquesState extends State<ListaParques> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Lista de Parques'),
-        ),
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
+    final parquesRepository =
+        Provider.of<ParquesRepository>(context, listen: false);
 
+    final database = context.read<ParquesDatabase>();
+
+    return FutureBuilder(
+        future: parquesRepository.getLots(),
+        builder: (_, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (snapshot.hasError) {
+              return Text('Error');
+            } else {
+              return buildLista(snapshot.data!);
+            }
+          }
+    });
+
+  }
+
+  Scaffold buildLista(listaLot) {
+    var listaLots = List<Lote>.from(listaLot);
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista de Parques'),
@@ -83,7 +86,7 @@ class _ListaParquesState extends State<ListaParques> {
 
                   var lotOcupacao = lote.lotAtual;
 
-                  if(lotOcupacao < 0){
+                  if (lotOcupacao < 0) {
                     lotOcupacao = lote.lotMaxima;
                   }
 
@@ -137,15 +140,13 @@ class _ListaParquesState extends State<ListaParques> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
-                                    label:
-                                    lote.tipoParque,
+                                    label: lote.tipoParque,
                                     tamanho: 14,
                                     cor: Colors.black54,
                                     font: FontWeight.normal,
                                   ),
                                   textoParqProx(
-                                    label:
-                                        '${lotAtual} Lugares Vazios!',
+                                    label: '${lotAtual} Lugares Vazios!',
                                     tamanho: 14,
                                     cor: corLotacao,
                                     font: FontWeight.bold,
@@ -317,8 +318,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      DetalheParque(lote: parqueEncontrado)),
+                  builder: (context) => DetalheParque(lote: parqueEncontrado)),
             );
           }
         },

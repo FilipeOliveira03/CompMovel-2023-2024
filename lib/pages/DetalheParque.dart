@@ -215,11 +215,7 @@ class _informacaoParqueState extends State<informacaoParque> {
             textoNormal: '${tarifa.preco.toString()}€',
             cor: widget.preto,
           ),
-          textoInformacoes(
-            textoNegrito: 'Duração máxima permitida: ',
-            textoNormal: '${tarifa.duracaoMax.toString()} horas',
-            cor: widget.preto,
-          ),
+
           textoInformacoes(
             textoNegrito: 'Informação atualizada as ',
             textoNormal: widget.lote.dataAtualizacao.split(' ')[1],
@@ -392,7 +388,6 @@ class _incidentesReportadosState extends State<incidentesReportados> {
     final database = context.read<ParquesDatabase>();
 
     final incidentes = database.getIncidentes(widget.lote.id);
-    print(incidentes);
     return FutureBuilder(
         future: database.getIncidentes(widget.lote.id),
         builder: (_, snapshot) {

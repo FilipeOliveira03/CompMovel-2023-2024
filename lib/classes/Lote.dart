@@ -22,6 +22,7 @@ class Lote {
     required this.latitude,
     required this.longitude,
     required this.tipoParque,
+    this.assertImagem,
   });
 
   factory Lote.fromJSON(Map<String, dynamic> map) {
@@ -33,6 +34,7 @@ class Lote {
         dataAtualizacao: map['data_ocupacao'],
         latitude: map['latitude'],
         longitude: map['longitude'],
+        assertImagem: 'assets/ImagensParques/${map['id_parque']}.png',
         tipoParque: map['tipo']);
   }
 

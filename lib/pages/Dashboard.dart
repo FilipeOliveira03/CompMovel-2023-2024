@@ -3,61 +3,17 @@ import 'package:marquee/marquee.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
 import 'package:proj_comp_movel/pages.dart';
 import 'package:provider/provider.dart';
-import 'package:geolocator/geolocator.dart';
 
 import '../classes/Lote.dart';
 import '../classes/ParquesRepository.dart';
+import '../data/parquesDatabase.dart';
 import 'DetalheParque.dart';
-import 'Mapa.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});
 
-  String textoLabel(Incidente incidente) {
-    return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, às ${incidente.data.hour}:${incidente.data.minute}!';
-  }
-
-  Future<Position> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return await Geolocator.getCurrentPosition();
-  }
-
   @override
   Widget build(BuildContext context) {
-    var listaIncidentesTotais = minhaListaIncidentes.incidentes.toList();
-
-    listaIncidentesTotais.sort((a, b) => b.data.compareTo(a.data));
-
-    var incidente;
-    if (listaIncidentesTotais.isEmpty) {
-      incidente = '       Não foram reportados incidentes recentemente!';
-    } else if (listaIncidentesTotais.length == 1) {
-      incidente = textoLabel(listaIncidentesTotais[0]);
-    } else if (listaIncidentesTotais.length == 2) {
-      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])}';
-    } else {
-      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
-    }
-
     var barra = Divider(
       height: 20,
       thickness: 2,
@@ -75,46 +31,24 @@ class Dashboard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             barra,
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.03,
-              width: MediaQuery.of(context).size.width * 0.92,
-              child: Marquee(
-                text: incidente,
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-                velocity: 40,
-              ),
-            ),
+            buildIncidentesWidget(),
             barra,
             textoInfoWidget(texto1: 'Parques próximos'),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.02,
             ),
+            miniMapaWidget(),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.25,
-              width: MediaQuery.of(context).size.width * 0.8,
-              child: Mapa(),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.02,
             ),
             Expanded(
-              child: FutureBuilder(
-                future: _getCurrentLocation(),
-                builder: (context, AsyncSnapshot<Position> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Erro ao obter localização'));
-                  } else {
-                    Position? position = snapshot.data;
-                    return tresParquesProxWidget(
-                      userLocation: position,
-                    );
-                  }
-                },
-              ),
+              child: tresParquesProxWidget(),
             ),
           ],
         ),
@@ -123,10 +57,96 @@ class Dashboard extends StatelessWidget {
   }
 }
 
-class tresParquesProxWidget extends StatefulWidget {
-  const tresParquesProxWidget({super.key, this.userLocation});
+class buildIncidentesWidget extends StatelessWidget {
+  const buildIncidentesWidget({
+    super.key,
+  });
 
-  final Position? userLocation;
+
+  String textoLabel(Incidente incidente) {
+
+    var nomeParque = incidente.nomeParque.split(' ');
+
+    if(nomeParque.contains('Parque')){
+      return '   ⚠️   Incidente reportado no ${incidente
+          .nomeParque}, às ${incidente.data.hour}:${incidente.data.minute}!';
+    }else{
+      return '   ⚠️   Incidente reportado no Parque ${incidente
+          .nomeParque}, às ${incidente.data.hour}:${incidente.data.minute}!';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final database = context.read<ParquesDatabase>();
+
+    return FutureBuilder(
+        future: database.getIncidentesRecentes(), builder: (_, snapshot) {
+      if (snapshot.connectionState != ConnectionState.done) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      } else {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('${snapshot.error}'),
+          );
+        } else {
+          return buildIncidentes(snapshot.data ?? [], context);
+        }
+      }
+    });
+  }
+
+  SizedBox buildIncidentes(List<Incidente> incidentes, BuildContext context) {
+
+    incidentes.sort((a, b) => b.data.compareTo(a.data));
+
+    incidentes.sort((a, b) {
+      if (b.data.hour != a.data.hour) {
+        return b.data.hour.compareTo(a.data.hour);
+      } else if (b.data.minute != a.data.minute) {
+        return b.data.minute.compareTo(a.data.minute);
+      } else {
+        return b.data.second.compareTo(a.data.second);
+      }
+    });
+
+    String incidente;
+    if (incidentes.isEmpty) {
+      incidente = '       Não foram reportados incidentes recentemente!';
+    } else if (incidentes.length == 1) {
+      incidente = textoLabel(incidentes[0]);
+    } else if (incidentes.length == 2) {
+      incidente = '${textoLabel(incidentes[0])} ${textoLabel(
+          incidentes[1])}';
+    } else {
+      incidente = '${textoLabel(incidentes[0])} ${textoLabel(
+          incidentes[1])} ${textoLabel(incidentes[2])}';
+    }
+
+    return SizedBox(
+      height: MediaQuery
+          .of(context)
+          .size
+          .height * 0.03,
+      width: MediaQuery
+          .of(context)
+          .size
+          .width * 0.92,
+      child: Marquee(
+        text: incidente,
+        style: TextStyle(
+          fontSize: 18,
+        ),
+        velocity: 40,
+      ),
+    );
+  }
+}
+
+class tresParquesProxWidget extends StatefulWidget {
+  const tresParquesProxWidget({super.key});
 
   @override
   State<tresParquesProxWidget> createState() => _tresParquesProxState();
@@ -142,37 +162,27 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
   }
 
   Future<void> fetchData() async {
-    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    final parquesRepository = Provider.of<ParquesRepository>(
+        context, listen: false);
     minhaListaParques = await parquesRepository.getLots();
-    if (widget.userLocation != null) {
-      for (var parque in minhaListaParques) {
-        parque.distancia = Geolocator.distanceBetween(
-          widget.userLocation!.latitude,
-          widget.userLocation!.longitude,
-          double.parse(parque.latitude),
-          double.parse(parque.longitude),
-        );
-      }
-      minhaListaParques.sort((a, b) => a.distancia!.compareTo(b.distancia!));
-    }
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    final parquesRepository = Provider.of<ParquesRepository>(
+        context, listen: false);
     return FutureBuilder(
       future: parquesRepository.getLots(),
-      builder: (_, snapshot){
-
-        if(snapshot.connectionState != ConnectionState.done){
+      builder: (_, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        }else{
-          if(snapshot.hasError){
+        } else {
+          if (snapshot.hasError) {
             return Text('Error');
-          }else{
+          } else {
             var lista = List<Lote>.from(minhaListaParques);
 
             if (lista.length >= 3) {
@@ -230,11 +240,12 @@ class listaParquesPertoWidget extends StatelessWidget {
     return ListView.builder(
       itemCount: itemCount,
       itemBuilder: (context, index) {
+        // lista.sort((a, b) => a.distancia.compareTo(b.distancia));
         Lote lote = lista[index];
 
         var lotOcupada = lote.lotAtual;
 
-        if(lotOcupada < 0){
+        if (lotOcupada < 0) {
           lotOcupada = lote.lotMaxima;
         }
 
@@ -246,7 +257,7 @@ class listaParquesPertoWidget extends StatelessWidget {
           corLotacao = Colors.red;
         } else if (lotAtual < (lote.lotMaxima * 0.1).toInt()) {
           corLotacao = Colors.amber;
-        }else if(lotAtual < 0){
+        } else if (lotAtual < 0) {
           lotAtual = lote.lotMaxima;
         } else {
           corLotacao = Colors.green;
@@ -277,6 +288,12 @@ class listaParquesPertoWidget extends StatelessWidget {
                           cor: Colors.black,
                           font: FontWeight.bold,
                         ),
+                        // textoParqProx(
+                        //   label: lote.distancia.toString(),
+                        //   tamanho: 20,
+                        //   cor: Colors.black,
+                        //   font: FontWeight.bold,
+                        // ),
                       ],
                     ),
                     Row(
@@ -295,7 +312,7 @@ class listaParquesPertoWidget extends StatelessWidget {
                           font: FontWeight.bold,
                         ),
                         textoParqProx(
-                          label: '${lote.distancia?.toStringAsFixed(1)} m de si',
+                          label: 'm de si',
                           tamanho: 14,
                           cor: Colors.black54,
                           font: FontWeight.normal,
@@ -336,6 +353,47 @@ class textoParqProx extends StatelessWidget {
         color: cor,
         fontWeight: font,
       ),
+    );
+  }
+}
+
+class miniMapaWidget extends StatelessWidget {
+  const miniMapaWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            'assets/maps_aumentado.png',
+            fit: BoxFit.cover,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.25,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.8,
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                width: 1,
+                color: Colors.black.withOpacity(0.3),
+                style: BorderStyle.solid,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

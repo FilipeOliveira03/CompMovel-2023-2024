@@ -1,6 +1,6 @@
 // import 'package:flutter/material.dart';
 // import 'package:proj_comp_movel/classes/Incidente.dart';
-// import 'package:proj_comp_movel/classes/ParquesRepository.dart';
+// import 'package:proj_comp_movel/classes/IParquesRepository.dart';
 //
 // enum TIPOPARQUE {
 //   ESTRUTURA,
