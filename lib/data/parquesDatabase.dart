@@ -64,15 +64,15 @@ class ParquesDatabase extends IParquesRepository {
     return result.map((entry) => Lote.fromDB(entry)).toList();
   }
 
-  Future<List<Lote>> getZone(String idParque) async {
-    if (_database == null) {
-      throw Exception('DB not initialized');
-    }
-
-    List result = await _database!.rawQuery("SELECT * FROM Zone WHERE idParque = '$idParque'");
-
-    return result.map((entry) => Lote.fromDB(entry)).toList();
-  }
+  // Future<List<Lote>> getLote(String idParque) async {
+  //   if (_database == null) {
+  //     throw Exception('DB not initialized');
+  //   }
+  //
+  //   List result = await _database!.rawQuery("SELECT * FROM Zone WHERE idParque = '$idParque'");
+  //
+  //   return result.map((entry) => Lote.fromDB(entry)).toList();
+  // }
 
   Future<Zone> getZones(String idParque) async {
     if (_database == null) {
@@ -83,8 +83,6 @@ class ParquesDatabase extends IParquesRepository {
 
     return result.map((entry) => Zone.fromDB(entry)).first;
   }
-
-
 
   Future<List<Incidente>> getIncidentes(String idParque) async {
     if (_database == null) {
@@ -118,6 +116,22 @@ class ParquesDatabase extends IParquesRepository {
 
     await _database!.insert('Incidente', incidente.toDb());
 
+  }
+
+  Future<void> insertLote(Lote lote) async{
+    if(_database == null){
+      throw Exception('DB not initialized');
+    }
+
+    await _database!.insert('Lote', lote.toDb());
+  }
+
+  Future<void> insertZone(Zone zone, String idParque) async{
+    if(_database == null){
+      throw Exception('DB not initialized');
+    }
+
+    await _database!.insert('Zone', zone.toDb(idParque));
   }
 
   Future<void> deleteAllLote() async{

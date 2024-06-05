@@ -9,6 +9,15 @@ class Zone {
     required this.tarifa,
   });
 
+  Map<String, dynamic> toDb(String idParque) {
+    return {
+      'idParque': idParque,
+      'produto': produto,
+      'horarioespecifico': horarioespecifico,
+      'tarifa': tarifa,
+    };
+  }
+
   factory Zone.fromDB(Map<String, dynamic> db) {
     return Zone(
         produto: db['produto'],

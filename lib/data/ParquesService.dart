@@ -1,15 +1,14 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/http/http_client.dart';
 
-import '../classes/Lote.dart';
-import '../classes/Zone.dart';
 import '../repository/IParquesRepository.dart';
+import '../classes/Lote.dart';
+import '../classes/Parque.dart';
+import '../classes/Zone.dart';
 
-
-class ParquesServices extends IParquesRepository {
+class ParquesServices extends IParquesRepository{
   final HttpClient _client;
 
   ParquesServices({required HttpClient client}) : _client = client;
@@ -53,11 +52,26 @@ class ParquesServices extends IParquesRepository {
 
 
       List<Lote> lots =
-          lotsJson.map((parquesJson) => Lote.fromJSON(parquesJson)).toList();
+      lotsJson.map((parquesJson) => Lote.fromJSON(parquesJson)).toList();
 
       return lots;
     } else {
       throw Exception('status code: ${response.statusCode}');
     }
+  }
+
+  Future<void> insertLote(Lote lote) async{
+    throw Exception('Not available');
+  }
+
+  Future<void> insertZone(Zone zone,String idParque) async{
+    throw Exception('Not available');
+  }
+
+  Future<void> deleteAllLote() async{
+    throw Exception('Not available');
+  }
+  Future<void> deleteAllZone() async{
+    throw Exception('Not available');
   }
 }

@@ -8,11 +8,12 @@ import 'package:provider/provider.dart';
 
 import '../classes/Lote.dart';
 import '../classes/Parque.dart';
-import '../classes/ParquesRepository.dart';
+import '../data/ParquesService.dart';
 import '../classes/Tarifa.dart';
 import '../classes/Zone.dart';
 import '../data/parquesDatabase.dart';
 import '../pages.dart';
+import '../repository/ParquesRepository.dart';
 
 class DetalheParque extends StatefulWidget {
   final Lote lote;
@@ -33,8 +34,7 @@ class _DetalheParqueState extends State<DetalheParque> {
 
   @override
   Widget build(BuildContext context) {
-    final parquesRepository =
-        Provider.of<ParquesRepository>(context, listen: false);
+    final parquesRepository =context.read<ParquesRepository>();
 
     var barra = Divider(
       height: 20,
@@ -73,7 +73,7 @@ class _DetalheParqueState extends State<DetalheParque> {
             color: Colors.black,
           ),
           child: FutureBuilder(
-            future: parquesRepository.getPlaces(widget.lote.id),
+            future: parquesRepository.getZones(widget.lote.id),
             builder: (_, snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
                 return Center(
@@ -202,7 +202,7 @@ class _informacaoParqueState extends State<informacaoParque> {
           ),
           textoInformacoes(
             textoNegrito: 'Tipo de Parque: ',
-            textoNormal: widget.lote.tipoParque,
+            textoNormal: widget.lote.tipoParque.trim(),
             cor: widget.preto,
           ),
           textoInformacoes(

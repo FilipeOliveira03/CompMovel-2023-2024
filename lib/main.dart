@@ -4,19 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/data/parquesDatabase.dart';
 import 'package:proj_comp_movel/http/http_client.dart';
 import 'package:proj_comp_movel/main_page.dart';
+import 'package:proj_comp_movel/repository/ParquesRepository.dart';
+import 'package:proj_comp_movel/services/connectivity_service.dart';
 import 'package:provider/provider.dart';
 
 import 'classes/Lote.dart';
-import 'classes/ParquesRepository.dart';
+import 'data/ParquesService.dart';
 import 'data/parquesDatabase.dart';
 
 void main() {
+  final parqueService = ParquesServices(client: HttpClient());
+  final parqueDatabase = ParquesDatabase();
+
   runApp(
     MultiProvider(
       providers: [
-        Provider<ParquesRepository>(
-            create: (_) => ParquesRepository(client: HttpClient())),
-        Provider<ParquesDatabase>(create: (_) => ParquesDatabase()),
+        Provider<ParquesServices>(create: (_) => parqueService),
+        Provider<ParquesDatabase>(create: (_) => parqueDatabase),
+        Provider<ParquesRepository>(create: (_) => ParquesRepository(local: parqueDatabase, remote: parqueService, connectivityService: ConnectivityService())),
         ChangeNotifierProvider(create: (_) => MainPageViewModel()),
       ],
       child: MyApp(),
@@ -42,7 +47,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> fetchData() async {
-    final parquesRepository = Provider.of<ParquesRepository>(context);
+    final parquesRepository = Provider.of<ParquesServices>(context);
     minhaListaParques = await parquesRepository.getLots();
     // minhaListaParques.sort((a, b) => a.distancia.compareTo(b.distancia));
     setState(() {}); // Update state to trigger rebuild
@@ -57,7 +62,7 @@ class _MyAppState extends State<MyApp> {
     return FutureBuilder(
         future: parquesDatabase.init(),
         builder: (_, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done){
+          if (snapshot.connectionState == ConnectionState.done) {
             return MaterialApp(
               title: 'Parques Emel',
               theme: ThemeData(
@@ -66,20 +71,20 @@ class _MyAppState extends State<MyApp> {
                   appBarTheme: ThemeData.from(colorScheme: colorScheme)
                       .appBarTheme
                       .copyWith(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.background,
-                  )),
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.background,
+                      )),
               home: MainPage(
-                  minhaListaParques: minhaListaParques), // Pass data to MainPage
+                  minhaListaParques:
+                      minhaListaParques), // Pass data to MainPage
             );
-          }else{
+          } else {
             return MaterialApp(
               home: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           }
-
         });
   }
 }

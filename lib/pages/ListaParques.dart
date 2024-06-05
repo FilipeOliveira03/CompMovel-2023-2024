@@ -4,8 +4,9 @@ import 'package:proj_comp_movel/pages/DetalheParque.dart';
 import 'package:provider/provider.dart';
 import '../classes/Lote.dart';
 import '../classes/Parque.dart';
-import '../classes/ParquesRepository.dart';
+import '../data/ParquesService.dart';
 import '../pages.dart';
+import '../repository/ParquesRepository.dart';
 
 class ListaParques extends StatefulWidget {
   const ListaParques({Key? key}) : super(key: key);
@@ -35,10 +36,8 @@ class _ListaParquesState extends State<ListaParques> {
 
   @override
   Widget build(BuildContext context) {
-    final parquesRepository =
-        Provider.of<ParquesRepository>(context, listen: false);
 
-    final database = context.read<ParquesDatabase>();
+    final parquesRepository = context.read<ParquesRepository>();
 
     return FutureBuilder(
         future: parquesRepository.getLots(),
@@ -49,7 +48,7 @@ class _ListaParquesState extends State<ListaParques> {
             );
           } else {
             if (snapshot.hasError) {
-              return Text('Error');
+              return Center(child: Text('Error'),);
             } else {
               return buildLista(snapshot.data!);
             }
@@ -236,7 +235,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
   }
 
   Future<void> _carregarParques() async {
-    final lista = await context.read<ParquesRepository>().getLots();
+    final lista = await context.read<ParquesServices>().getLots();
     setState(() {
       minhaListaParques = lista;
     });

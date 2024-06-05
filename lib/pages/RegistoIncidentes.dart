@@ -9,9 +9,10 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 import '../classes/Incidente.dart';
 import '../classes/Lote.dart';
 import '../classes/Parque.dart';
-import '../classes/ParquesRepository.dart';
+import '../data/ParquesService.dart';
 import '../main_page.dart';
 import '../pages.dart';
+import '../repository/ParquesRepository.dart';
 
 class RegistoIncidentes extends StatefulWidget {
   final String? initialParque;
@@ -42,7 +43,6 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
   void initState() {
     super.initState();
 
-    // Obtém a lista de parques do repositório
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final minhaListaParques = await context.read<ParquesRepository>().getLots();
       setState(() {
@@ -61,7 +61,6 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
     );
 
     if (parqueSelecionado != null) {
-      parqueSelecionado.incidentes.add(incidente);
       minhaListaIncidentes.incidentes.add(incidente);
     }
   }
@@ -157,7 +156,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
       child: ElevatedButton(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            final minhaListaParques = await context.read<ParquesRepository>().getLots();
+            final minhaListaParques = await context.read<ParquesServices>().getLots();
             var idParque = listaParquesComId[nomeParque];
             // Verifica se _imageFile é nulo e cria o objeto Incidente de acordo
             Incidente novoIncidente = Incidente(

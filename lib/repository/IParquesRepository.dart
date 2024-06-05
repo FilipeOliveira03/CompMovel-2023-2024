@@ -10,8 +10,10 @@ import '../classes/Zone.dart';
 
 
 abstract class IParquesRepository {
-
-  Future<Zone> getZones(String idParque);
-
   Future<List<Lote>> getLots();
+  Future<Zone> getZones(String idParque);
+  Future<void> insertLote(Lote lote);
+  Future<void> insertZone(Zone zone, String idParque);
+  Future<void> deleteAllLote();
+  Future<void> deleteAllZone();
 }

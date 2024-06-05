@@ -6,7 +6,8 @@ import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import '../classes/Lote.dart';
-import '../classes/ParquesRepository.dart';
+import '../data/ParquesService.dart';
+import '../repository/ParquesRepository.dart';
 import 'DetalheParque.dart';
 
 class Mapa extends StatefulWidget {
@@ -34,7 +35,7 @@ class _MapaState extends State<Mapa> {
   }
 
   Future<void> fetchData() async {
-    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    final parquesRepository = context.read<ParquesRepository>();
     minhaListaParques = await parquesRepository.getLots();
     setState(() {
       _updateMarkers();

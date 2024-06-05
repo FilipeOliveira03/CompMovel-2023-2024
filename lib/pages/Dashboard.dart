@@ -5,8 +5,9 @@ import 'package:proj_comp_movel/pages.dart';
 import 'package:provider/provider.dart';
 
 import '../classes/Lote.dart';
-import '../classes/ParquesRepository.dart';
+import '../data/ParquesService.dart';
 import '../data/parquesDatabase.dart';
+import '../repository/ParquesRepository.dart';
 import 'DetalheParque.dart';
 
 class Dashboard extends StatelessWidget {
@@ -158,20 +159,11 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
   @override
   void initState() {
     super.initState();
-    fetchData();
-  }
-
-  Future<void> fetchData() async {
-    final parquesRepository = Provider.of<ParquesRepository>(
-        context, listen: false);
-    minhaListaParques = await parquesRepository.getLots();
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final parquesRepository = Provider.of<ParquesRepository>(
-        context, listen: false);
+    final parquesRepository = context.read<ParquesRepository>();
     return FutureBuilder(
       future: parquesRepository.getLots(),
       builder: (_, snapshot) {
@@ -183,7 +175,7 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
           if (snapshot.hasError) {
             return Text('Error');
           } else {
-            var lista = List<Lote>.from(minhaListaParques);
+            var lista = List<Lote>.from(snapshot.data!);
 
             if (lista.length >= 3) {
               return listaParquesPertoWidget(

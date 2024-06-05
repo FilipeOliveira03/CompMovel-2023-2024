@@ -11,7 +11,6 @@ class Lote {
   String tipoParque;
   double? distancia;
   String? assertImagem;
-  List<Incidente> incidentes = [];
 
   Lote({
     required this.id,
@@ -25,28 +24,45 @@ class Lote {
     this.assertImagem,
   });
 
+  Map<String, dynamic> toDb() {
+    return {
+      'id': id,
+      'nome': nome,
+      'lotAtual': lotAtual,
+      'lotMaxima': lotMaxima,
+      'dataAtualizacao': dataAtualizacao,
+      'latitude': latitude,
+      'longitude': longitude,
+      'tipoParque': tipoParque,
+      'assertImagem': assertImagem,
+    };
+  }
+
   factory Lote.fromJSON(Map<String, dynamic> map) {
     return Lote(
-        id: map['id_parque'],
-        nome: map['nome'],
-        lotAtual: map['ocupacao'],
-        lotMaxima: map['capacidade_max'],
-        dataAtualizacao: map['data_ocupacao'],
-        latitude: map['latitude'],
-        longitude: map['longitude'],
-        assertImagem: 'assets/ImagensParques/${map['id_parque']}.png',
-        tipoParque: map['tipo']);
+      id: map['id_parque'],
+      nome: map['nome'],
+      lotAtual: map['ocupacao'],
+      lotMaxima: map['capacidade_max'],
+      dataAtualizacao: map['data_ocupacao'],
+      latitude: map['latitude'],
+      longitude: map['longitude'],
+      tipoParque: map['tipo'],
+      assertImagem: 'assets/ImagensParques/${map['id_parque']}.png',
+    );
   }
 
   factory Lote.fromDB(Map<String, dynamic> db) {
     return Lote(
-        id: db['id_parque'],
-        nome: db['nome'],
-        lotAtual: db['ocupacao'],
-        lotMaxima: db['capacidade_max'],
-        dataAtualizacao: db['data_ocupacao'],
-        latitude: db['latitude'],
-        longitude: db['longitude'],
-        tipoParque: db['tipo']);
+      id: db['id'],
+      nome: db['nome'],
+      lotAtual: db['lotAtual'],
+      lotMaxima: db['lotMaxima'],
+      dataAtualizacao: db['dataAtualizacao'],
+      latitude: db['latitude'],
+      longitude: db['longitude'],
+      tipoParque: db['tipoParque'],
+      assertImagem: 'assets/ImagensParques/${db['id_parque']}.png',
+    );
   }
 }
