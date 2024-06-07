@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/data/parquesDatabase.dart';
 import 'package:proj_comp_movel/pages/DetalheParque.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 import '../classes/Lote.dart';
 import '../classes/Parque.dart';
 import '../data/ParquesService.dart';
@@ -17,30 +18,64 @@ class ListaParques extends StatefulWidget {
 
 class _ListaParquesState extends State<ListaParques> {
   bool ordenarPorDistanciaCrescente = true;
-
+  Position? userLocation;
 
   @override
   void initState() {
     super.initState();
+    _getCurrentLocation();
   }
 
-  void ordenarParquesPorDistancia() {
-    // setState(() {
-    //   listaParques.sort((a, b) => b.distancia.compareTo(a.distancia));
-    //   ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
-    //   if (ordenarPorDistanciaCrescente) {
-    //     listaParques.sort((a, b) => a.distancia.compareTo(b.distancia));
-    //   }
-    // });
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    userLocation = await Geolocator.getCurrentPosition();
+    setState(() {});
+  }
+
+  Future<List<Lote>> _fetchAndSortParques(ParquesRepository parquesRepository) async {
+    var listaParques = await parquesRepository.getLots();
+    if (userLocation != null) {
+      for (var parque in listaParques) {
+        parque.distancia = Geolocator.distanceBetween(
+          userLocation!.latitude,
+          userLocation!.longitude,
+          double.parse(parque.latitude),
+          double.parse(parque.longitude),
+        );
+      }
+      listaParques.sort((a, b) => a.distancia!.compareTo(b.distancia!));
+    }
+    if (!ordenarPorDistanciaCrescente) {
+      listaParques = listaParques.reversed.toList();
+    }
+    return listaParques;
   }
 
   @override
   Widget build(BuildContext context) {
-
     final parquesRepository = context.read<ParquesRepository>();
 
     return FutureBuilder(
-        future: parquesRepository.getLots(),
+        future: _fetchAndSortParques(parquesRepository),
         builder: (_, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Center(
@@ -50,15 +85,14 @@ class _ListaParquesState extends State<ListaParques> {
             if (snapshot.hasError) {
               return Center(child: Text('Error'),);
             } else {
-              return buildLista(snapshot.data!);
+              var listaParques = List<Lote>.from(snapshot.data!);
+              return buildLista(listaParques);
             }
           }
-    });
-
+        });
   }
 
-  Scaffold buildLista(listaLot) {
-    var listaLots = List<Lote>.from(listaLot);
+  Scaffold buildLista(List<Lote> listaLots) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista de Parques'),
@@ -118,7 +152,7 @@ class _ListaParquesState extends State<ListaParques> {
                             children: [
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
                                     label: lote.nome,
@@ -126,17 +160,11 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: Colors.black,
                                     font: FontWeight.bold,
                                   ),
-                                  // textoParqProx(
-                                  //   label: lote.distancia.toString(),
-                                  //   tamanho: 20,
-                                  //   cor: Colors.black,
-                                  //   font: FontWeight.bold,
-                                  // ),
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
                                     label: lote.tipoParque,
@@ -150,12 +178,13 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: corLotacao,
                                     font: FontWeight.bold,
                                   ),
-                                  textoParqProx(
-                                    label: 'm de si',
-                                    tamanho: 14,
-                                    cor: Colors.black54,
-                                    font: FontWeight.normal,
-                                  ),
+                                  if (lote.distancia != null)
+                                    textoParqProx(
+                                      label: '${lote.distancia!.toStringAsFixed(1)} m de si',
+                                      tamanho: 14,
+                                      cor: Colors.black54,
+                                      font: FontWeight.normal,
+                                    ),
                                 ],
                               ),
                             ],
@@ -175,7 +204,13 @@ class _ListaParquesState extends State<ListaParques> {
               endIndent: 20,
             ),
             ElevatedButton.icon(
-              onPressed: ordenarParquesPorDistancia,
+              onPressed: () async {
+                var listaParques = await _fetchAndSortParques(context.read<ParquesRepository>());
+                setState(() {
+                  ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
+                  buildLista(listaParques);
+                });
+              },
               icon: Icon(ordenarPorDistanciaCrescente
                   ? Icons.arrow_upward
                   : Icons.arrow_downward),
@@ -243,7 +278,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
 
   Iterable<Widget> getListaHistorico(SearchController controller) {
     return historico.map(
-      (Lote lote) => ListTile(
+          (Lote lote) => ListTile(
         leading: const Icon(Icons.history),
         title: Text(lote.nome),
         trailing: IconButton(
@@ -264,81 +299,82 @@ class _SearchBarAppState extends State<SearchBarApp> {
         .where((Lote lote) => lote.nome.contains(input))
         .map(
           (Lote lote) => ListTile(
-            title: Text(lote.nome),
-            trailing: IconButton(
-              icon: const Icon(Icons.call_missed),
-              onPressed: () {
-                controller.text = lote.nome;
-                controller.selection =
-                    TextSelection.collapsed(offset: controller.text.length);
-              },
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DetalheParque(lote: lote)),
-              );
-              mudaHistorico(lote);
-            },
-          ),
-        );
-  }
-
-  void mudaHistorico(Lote lote) {
-    setState(() {
-      if (historico.length >= 5) {
-        historico.removeLast();
-      }
-      historico.insert(0, lote);
-    });
+        title: Text(lote.nome),
+        trailing: IconButton(
+          icon: const Icon(Icons.call_missed),
+          onPressed: () {
+            controller.text = lote.nome;
+            controller.selection =
+                TextSelection.collapsed(offset: controller.text.length);
+          },
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 45,
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: SearchAnchor.bar(
-        barHintText: 'Procura parques',
-        onSubmitted: (String value) {
-          bool existe = false;
-          late Lote parqueEncontrado;
-
-          for (var lote in minhaListaParques) {
-            if (lote.nome == value) {
-              existe = true;
-              parqueEncontrado = lote;
-              break;
-            }
-          }
-
-          if (existe) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DetalheParque(lote: parqueEncontrado)),
-            );
-          }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Autocomplete<Lote>(
+        displayStringForOption: (Lote option) => option.nome,
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          return minhaListaParques.where((Lote lote) {
+            return lote.nome
+                .toLowerCase()
+                .contains(textEditingValue.text.toLowerCase());
+          }).toList();
         },
-        suggestionsBuilder:
-            (BuildContext context, SearchController controller) {
-          if (controller.text.isEmpty) {
-            if (historico.isNotEmpty) {
-              return getListaHistorico(controller);
-            }
-            return <Widget>[
-              Center(
-                child: Column(
-                  children: [
-                    SizedBox(height: 5),
-                    Text('Não têm pesquisas recentes'),
-                  ],
+        onSelected: (Lote selection) {
+          historico.add(selection);
+          setState(() {});
+        },
+        fieldViewBuilder:
+            (context, controller, focusNode, onFieldSubmitted) {
+          return TextField(
+            controller: controller,
+            focusNode: focusNode,
+            onSubmitted: (String value) {
+              onFieldSubmitted();
+            },
+            decoration: InputDecoration(
+              hintText: 'Pesquisar Parques',
+              suffixIcon: IconButton(
+                icon: Icon(Icons.clear),
+                onPressed: () {
+                  controller.clear();
+                  focusNode.unfocus();
+                },
+              ),
+            ),
+          );
+        },
+        optionsViewBuilder:
+            (context, AutocompleteOnSelected<Lote> onSelected, options) {
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                color: Colors.white,
+                child: ListView.builder(
+                  padding: EdgeInsets.all(8.0),
+                  itemCount: options.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final Lote option = options.elementAt(index);
+                    return GestureDetector(
+                      onTap: () {
+                        onSelected(option);
+                      },
+                      child: ListTile(
+                        title: Text(option.nome),
+                      ),
+                    );
+                  },
                 ),
               ),
-            ];
-          }
-          return getSugestoes(controller);
+            ),
+          );
         },
       ),
     );
