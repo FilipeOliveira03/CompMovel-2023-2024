@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:proj_comp_movel/data/parquesDatabase.dart';
 import 'package:proj_comp_movel/pages/DetalheParque.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import '../classes/Lote.dart';
-import '../classes/Parque.dart';
 import '../data/ParquesService.dart';
-import '../pages.dart';
 import '../repository/ParquesRepository.dart';
 
 class ListaParques extends StatefulWidget {
