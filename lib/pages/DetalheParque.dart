@@ -1,18 +1,12 @@
-import 'package:cross_file_image/cross_file_image.dart';
 import 'package:flutter/material.dart';
 import 'package:proj_comp_movel/classes/Incidente.dart';
 import 'package:proj_comp_movel/main_page.dart';
-import 'package:proj_comp_movel/pages/Mapa.dart';
-import 'package:proj_comp_movel/pages/RegistoIncidentes.dart';
 import 'package:provider/provider.dart';
 
 import '../classes/Lote.dart';
-import '../classes/Parque.dart';
-import '../data/ParquesService.dart';
 import '../classes/Tarifa.dart';
 import '../classes/Zone.dart';
 import '../data/parquesDatabase.dart';
-import '../pages.dart';
 import '../repository/ParquesRepository.dart';
 
 class DetalheParque extends StatefulWidget {

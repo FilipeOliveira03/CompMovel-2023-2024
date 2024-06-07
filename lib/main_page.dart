@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:proj_comp_movel/classes/Parque.dart';
 import 'package:proj_comp_movel/pages.dart';
 import 'package:provider/provider.dart';
 
 import 'classes/Lote.dart';
-import 'pages/Dashboard.dart';
 
 class MainPageViewModel extends ChangeNotifier{
   int _selectedIndex = 0;

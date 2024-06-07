@@ -157,6 +157,19 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: Colors.black,
                                     font: FontWeight.bold,
                                   ),
+                                  lote.distancia! >= 1000 ?
+                                  textoParqProx(
+                                    label: (lote.distancia! / 1000).toStringAsFixed(1),
+                                    tamanho: 18,
+                                    cor: Colors.black,
+                                    font: FontWeight.bold,
+                                  ) :
+                                  textoParqProx(
+                                    label: '${lote.distancia?.toStringAsFixed(0)}',
+                                    tamanho: 18,
+                                    cor: Colors.black,
+                                    font: FontWeight.bold,
+                                  ),
                                 ],
                               ),
                               Row(
@@ -175,9 +188,14 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: corLotacao,
                                     font: FontWeight.bold,
                                   ),
-                                  if (lote.distancia != null)
+                                    lote.distancia! >= 1000 ?
                                     textoParqProx(
-                                      label: '${lote.distancia!.toStringAsFixed(1)} m de si',
+                                      label: 'Km de si',
+                                      tamanho: 14,
+                                      cor: Colors.black54,
+                                      font: FontWeight.normal,
+                                    ) : textoParqProx(
+                                      label: 'm de si',
                                       tamanho: 14,
                                       cor: Colors.black54,
                                       font: FontWeight.normal,
@@ -267,7 +285,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
   }
 
   Future<void> _carregarParques() async {
-    final lista = await context.read<ParquesServices>().getLots();
+    final lista = await context.read<ParquesRepository>().getLots();
     setState(() {
       minhaListaParques = lista;
     });
@@ -305,73 +323,73 @@ class _SearchBarAppState extends State<SearchBarApp> {
                 TextSelection.collapsed(offset: controller.text.length);
           },
         ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetalheParque(lote: lote)),
+          );
+          mudaHistorico(lote);
+        },
       ),
     );
   }
 
+  void mudaHistorico(Lote lote) {
+    setState(() {
+      if (historico.length >= 5) {
+        historico.removeLast();
+      }
+      historico.insert(0, lote);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Autocomplete<Lote>(
-        displayStringForOption: (Lote option) => option.nome,
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          return minhaListaParques.where((Lote lote) {
-            return lote.nome
-                .toLowerCase()
-                .contains(textEditingValue.text.toLowerCase());
-          }).toList();
+    return SizedBox(
+      height: 45,
+      width: MediaQuery.of(context).size.width * 0.9,
+      child: SearchAnchor.bar(
+        barHintText: 'Procura parques',
+        onSubmitted: (String value) {
+          bool existe = false;
+          late Lote parqueEncontrado;
+
+          for (var lote in minhaListaParques) {
+            if (lote.nome == value) {
+              existe = true;
+              parqueEncontrado = lote;
+              break;
+            }
+          }
+
+          if (existe) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      DetalheParque(lote: parqueEncontrado)),
+            );
+          }
         },
-        onSelected: (Lote selection) {
-          historico.add(selection);
-          setState(() {});
-        },
-        fieldViewBuilder:
-            (context, controller, focusNode, onFieldSubmitted) {
-          return TextField(
-            controller: controller,
-            focusNode: focusNode,
-            onSubmitted: (String value) {
-              onFieldSubmitted();
-            },
-            decoration: InputDecoration(
-              hintText: 'Pesquisar Parques',
-              suffixIcon: IconButton(
-                icon: Icon(Icons.clear),
-                onPressed: () {
-                  controller.clear();
-                  focusNode.unfocus();
-                },
-              ),
-            ),
-          );
-        },
-        optionsViewBuilder:
-            (context, AutocompleteOnSelected<Lote> onSelected, options) {
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Material(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.8,
-                color: Colors.white,
-                child: ListView.builder(
-                  padding: EdgeInsets.all(8.0),
-                  itemCount: options.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final Lote option = options.elementAt(index);
-                    return GestureDetector(
-                      onTap: () {
-                        onSelected(option);
-                      },
-                      child: ListTile(
-                        title: Text(option.nome),
-                      ),
-                    );
-                  },
+        suggestionsBuilder:
+            (BuildContext context, SearchController controller) {
+          if (controller.text.isEmpty) {
+            if (historico.isNotEmpty) {
+              return getListaHistorico(controller);
+            }
+            return <Widget>[
+              Center(
+                child: Column(
+                  children: [
+                    SizedBox(height: 5),
+                    Text('Não têm pesquisas recentes'),
+                  ],
                 ),
               ),
-            ),
-          );
+            ];
+          }
+          return getSugestoes(controller);
         },
       ),
     );

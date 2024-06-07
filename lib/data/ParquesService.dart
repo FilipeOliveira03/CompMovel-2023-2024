@@ -5,7 +5,6 @@ import 'package:proj_comp_movel/http/http_client.dart';
 
 import '../repository/IParquesRepository.dart';
 import '../classes/Lote.dart';
-import '../classes/Parque.dart';
 import '../classes/Zone.dart';
 
 class ParquesServices extends IParquesRepository{

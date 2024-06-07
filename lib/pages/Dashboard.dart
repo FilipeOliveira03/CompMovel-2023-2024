@@ -277,6 +277,19 @@ class listaParquesPertoWidget extends StatelessWidget {
                           cor: Colors.black,
                           font: FontWeight.bold,
                         ),
+                        lote.distancia! >= 1000 ?
+                        textoParqProx(
+                          label: (lote.distancia! / 1000).toStringAsFixed(1),
+                          tamanho: 18,
+                          cor: Colors.black,
+                          font: FontWeight.bold,
+                        ) :
+                        textoParqProx(
+                          label: '${lote.distancia?.toStringAsFixed(0)}',
+                          tamanho: 18,
+                          cor: Colors.black,
+                          font: FontWeight.bold,
+                        ),
                       ],
                     ),
                     Row(
@@ -294,8 +307,14 @@ class listaParquesPertoWidget extends StatelessWidget {
                           cor: corLotacao,
                           font: FontWeight.bold,
                         ),
+                        lote.distancia! >= 1000 ?
                         textoParqProx(
-                          label: '${lote.distancia?.toStringAsFixed(1)} m de si',
+                          label: 'Km de si',
+                          tamanho: 14,
+                          cor: Colors.black54,
+                          font: FontWeight.normal,
+                        ) : textoParqProx(
+                          label: 'm de si',
                           tamanho: 14,
                           cor: Colors.black54,
                           font: FontWeight.normal,
@@ -311,6 +330,7 @@ class listaParquesPertoWidget extends StatelessWidget {
       },
     );
   }
+
 }
 
 class textoParqProx extends StatelessWidget {
