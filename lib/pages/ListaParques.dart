@@ -41,14 +41,16 @@ class _ListaParquesState extends State<ListaParques> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     userLocation = await Geolocator.getCurrentPosition();
     setState(() {});
   }
 
-  Future<List<Lote>> _fetchAndSortParques(ParquesRepository parquesRepository) async {
+  Future<List<Lote>> _fetchAndSortParques(
+      ParquesRepository parquesRepository) async {
     var listaParques = await parquesRepository.getLots();
     if (userLocation != null) {
       for (var parque in listaParques) {
@@ -80,7 +82,9 @@ class _ListaParquesState extends State<ListaParques> {
             );
           } else {
             if (snapshot.hasError) {
-              return Center(child: Text('Error'),);
+              return Center(
+                child: Text('Error'),
+              );
             } else {
               var listaParques = List<Lote>.from(snapshot.data!);
               return buildLista(listaParques);
@@ -149,7 +153,7 @@ class _ListaParquesState extends State<ListaParques> {
                             children: [
                               Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
                                     label: lote.nome,
@@ -157,24 +161,26 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: Colors.black,
                                     font: FontWeight.bold,
                                   ),
-                                  lote.distancia! >= 1000 ?
-                                  textoParqProx(
-                                    label: (lote.distancia! / 1000).toStringAsFixed(1),
-                                    tamanho: 18,
-                                    cor: Colors.black,
-                                    font: FontWeight.bold,
-                                  ) :
-                                  textoParqProx(
-                                    label: '${lote.distancia?.toStringAsFixed(0)}',
-                                    tamanho: 18,
-                                    cor: Colors.black,
-                                    font: FontWeight.bold,
-                                  ),
+                                  lote.distancia! >= 1000
+                                      ? textoParqProx(
+                                          label: (lote.distancia! / 1000)
+                                              .toStringAsFixed(1),
+                                          tamanho: 18,
+                                          cor: Colors.black,
+                                          font: FontWeight.bold,
+                                        )
+                                      : textoParqProx(
+                                          label:
+                                              '${lote.distancia?.toStringAsFixed(0)}',
+                                          tamanho: 18,
+                                          cor: Colors.black,
+                                          font: FontWeight.bold,
+                                        ),
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   textoParqProx(
                                     label: lote.tipoParque,
@@ -188,18 +194,19 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: corLotacao,
                                     font: FontWeight.bold,
                                   ),
-                                    lote.distancia! >= 1000 ?
-                                    textoParqProx(
-                                      label: 'Km de si',
-                                      tamanho: 14,
-                                      cor: Colors.black54,
-                                      font: FontWeight.normal,
-                                    ) : textoParqProx(
-                                      label: 'm de si',
-                                      tamanho: 14,
-                                      cor: Colors.black54,
-                                      font: FontWeight.normal,
-                                    ),
+                                  lote.distancia! >= 1000
+                                      ? textoParqProx(
+                                          label: 'Km de si',
+                                          tamanho: 14,
+                                          cor: Colors.black54,
+                                          font: FontWeight.normal,
+                                        )
+                                      : textoParqProx(
+                                          label: 'm de si',
+                                          tamanho: 14,
+                                          cor: Colors.black54,
+                                          font: FontWeight.normal,
+                                        ),
                                 ],
                               ),
                             ],
@@ -220,7 +227,8 @@ class _ListaParquesState extends State<ListaParques> {
             ),
             ElevatedButton.icon(
               onPressed: () async {
-                var listaParques = await _fetchAndSortParques(context.read<ParquesRepository>());
+                var listaParques = await _fetchAndSortParques(
+                    context.read<ParquesRepository>());
                 setState(() {
                   ordenarPorDistanciaCrescente = !ordenarPorDistanciaCrescente;
                   buildLista(listaParques);
@@ -293,7 +301,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
 
   Iterable<Widget> getListaHistorico(SearchController controller) {
     return historico.map(
-          (Lote lote) => ListTile(
+      (Lote lote) => ListTile(
         leading: const Icon(Icons.history),
         title: Text(lote.nome),
         trailing: IconButton(
@@ -314,25 +322,25 @@ class _SearchBarAppState extends State<SearchBarApp> {
         .where((Lote lote) => lote.nome.contains(input))
         .map(
           (Lote lote) => ListTile(
-        title: Text(lote.nome),
-        trailing: IconButton(
-          icon: const Icon(Icons.call_missed),
-          onPressed: () {
-            controller.text = lote.nome;
-            controller.selection =
-                TextSelection.collapsed(offset: controller.text.length);
-          },
-        ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DetalheParque(lote: lote)),
-          );
-          mudaHistorico(lote);
-        },
-      ),
-    );
+            title: Text(lote.nome),
+            trailing: IconButton(
+              icon: const Icon(Icons.call_missed),
+              onPressed: () {
+                controller.text = lote.nome;
+                controller.selection =
+                    TextSelection.collapsed(offset: controller.text.length);
+              },
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetalheParque(lote: lote)),
+              );
+              mudaHistorico(lote);
+            },
+          ),
+        );
   }
 
   void mudaHistorico(Lote lote) {
@@ -367,8 +375,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      DetalheParque(lote: parqueEncontrado)),
+                  builder: (context) => DetalheParque(lote: parqueEncontrado)),
             );
           }
         },

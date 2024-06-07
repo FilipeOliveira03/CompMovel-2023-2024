@@ -28,7 +28,7 @@ class _DetalheParqueState extends State<DetalheParque> {
 
   @override
   Widget build(BuildContext context) {
-    final parquesRepository =context.read<ParquesRepository>();
+    final parquesRepository = context.read<ParquesRepository>();
 
     var barra = Divider(
       height: 20,
@@ -39,21 +39,6 @@ class _DetalheParqueState extends State<DetalheParque> {
     );
 
     Color corDisponibilidade = Colors.white10;
-
-    // switch (parque.disponibilidade) {
-    //   case DISPONIBILIDADE.DISPONIVEL:
-    //     corDisponibilidade = Colors.green;
-    //     break;
-    //   case DISPONIBILIDADE.PARCIALMENTE_LOTADO:
-    //     corDisponibilidade = Colors.amber;
-    //     break;
-    //   case DISPONIBILIDADE.QUASE_LOTADO:
-    //     corDisponibilidade = Colors.redAccent;
-    //     break;
-    //   case DISPONIBILIDADE.LOTADO:
-    //     corDisponibilidade = Colors.red.shade900;
-    //     break;
-    // }
 
     Color preto = Colors.black;
 
@@ -75,7 +60,9 @@ class _DetalheParqueState extends State<DetalheParque> {
                 );
               } else {
                 if (snapshot.hasError) {
-                  return Text('Error');
+                  return Center(
+                    child: Text('Error'),
+                  );
                 } else {
                   return buildDetails(
                       snapshot.data!, barra, corDisponibilidade, preto);
@@ -209,7 +196,6 @@ class _informacaoParqueState extends State<informacaoParque> {
             textoNormal: '${tarifa.preco.toString()}€',
             cor: widget.preto,
           ),
-
           textoInformacoes(
             textoNegrito: 'Informação atualizada as ',
             textoNormal: widget.lote.dataAtualizacao.split(' ')[1],
@@ -240,12 +226,12 @@ class _textoDistanciaState extends State<textoDistancia> {
   Widget build(BuildContext context) {
     var textoDistancia = '';
 
-    // if (widget.parque.distancia.toString().length > 3) {
-    //   textoDistancia =
-    //       '${widget.parque.distancia ~/ 1000}.${(widget.parque.distancia ~/ 100) % 10} km ';
-    // } else {
-    //   textoDistancia = '${widget.parque.distancia} m ';
-    // }
+    if (widget.lote.distancia.toString().length > 3) {
+      textoDistancia =
+          '${widget.lote.distancia! ~/ 1000}.${(widget.lote.distancia! ~/ 100) % 10} km ';
+    } else {
+      textoDistancia = '${widget.lote.distancia} m ';
+    }
 
     return RichText(
       text: TextSpan(
@@ -262,7 +248,6 @@ class _textoDistanciaState extends State<textoDistancia> {
             text: textoDistancia,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.green,
             ),
           ),
           TextSpan(
@@ -402,9 +387,6 @@ class _incidentesReportadosState extends State<incidentesReportados> {
   }
 
   Widget builderIncidentes(List<Incidente> incidentes, BuildContext context) {
-
-
-
     if (incidentes.isEmpty) {
       return Container(
         height: MediaQuery.of(context).size.height * 0.15,
@@ -426,12 +408,11 @@ class _incidentesReportadosState extends State<incidentesReportados> {
                   showModalBottomSheet(
                     context: context,
                     builder: (BuildContext context) {
-
                       var descricao;
 
-                      if (incidentes[index].descricaoDetalhada == ''){
+                      if (incidentes[index].descricaoDetalhada == '') {
                         descricao = 'Não existe informação adicional';
-                      }else{
+                      } else {
                         descricao = incidentes[index].descricaoDetalhada;
                       }
 

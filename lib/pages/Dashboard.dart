@@ -35,7 +35,8 @@ class Dashboard extends StatelessWidget {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();
@@ -53,9 +54,11 @@ class Dashboard extends StatelessWidget {
     } else if (listaIncidentesTotais.length == 1) {
       incidente = textoLabel(listaIncidentesTotais[0]);
     } else if (listaIncidentesTotais.length == 2) {
-      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])}';
+      incidente =
+          '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])}';
     } else {
-      incidente = '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
+      incidente =
+          '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
     }
 
     var barra = Divider(
@@ -142,7 +145,8 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
   }
 
   Future<void> fetchData() async {
-    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    final parquesRepository =
+        Provider.of<ParquesRepository>(context, listen: false);
     minhaListaParques = await parquesRepository.getLots();
     if (widget.userLocation != null) {
       for (var parque in minhaListaParques) {
@@ -160,19 +164,19 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final parquesRepository = Provider.of<ParquesRepository>(context, listen: false);
+    final parquesRepository =
+        Provider.of<ParquesRepository>(context, listen: false);
     return FutureBuilder(
       future: parquesRepository.getLots(),
-      builder: (_, snapshot){
-
-        if(snapshot.connectionState != ConnectionState.done){
+      builder: (_, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
           return Center(
             child: CircularProgressIndicator(),
           );
-        }else{
-          if(snapshot.hasError){
+        } else {
+          if (snapshot.hasError) {
             return Text('Error');
-          }else{
+          } else {
             var lista = List<Lote>.from(minhaListaParques);
 
             if (lista.length >= 3) {
@@ -216,11 +220,8 @@ class _tresParquesProxState extends State<tresParquesProxWidget> {
 }
 
 class listaParquesPertoWidget extends StatelessWidget {
-  const listaParquesPertoWidget({
-    super.key,
-    required this.lista,
-    required this.itemCount
-  });
+  const listaParquesPertoWidget(
+      {super.key, required this.lista, required this.itemCount});
 
   final List<Lote> lista;
   final int itemCount;
@@ -234,7 +235,7 @@ class listaParquesPertoWidget extends StatelessWidget {
 
         var lotOcupada = lote.lotAtual;
 
-        if(lotOcupada < 0){
+        if (lotOcupada < 0) {
           lotOcupada = lote.lotMaxima;
         }
 
@@ -246,7 +247,7 @@ class listaParquesPertoWidget extends StatelessWidget {
           corLotacao = Colors.red;
         } else if (lotAtual < (lote.lotMaxima * 0.1).toInt()) {
           corLotacao = Colors.amber;
-        }else if(lotAtual < 0){
+        } else if (lotAtual < 0) {
           lotAtual = lote.lotMaxima;
         } else {
           corLotacao = Colors.green;
@@ -277,19 +278,20 @@ class listaParquesPertoWidget extends StatelessWidget {
                           cor: Colors.black,
                           font: FontWeight.bold,
                         ),
-                        lote.distancia! >= 1000 ?
-                        textoParqProx(
-                          label: (lote.distancia! / 1000).toStringAsFixed(1),
-                          tamanho: 18,
-                          cor: Colors.black,
-                          font: FontWeight.bold,
-                        ) :
-                        textoParqProx(
-                          label: '${lote.distancia?.toStringAsFixed(0)}',
-                          tamanho: 18,
-                          cor: Colors.black,
-                          font: FontWeight.bold,
-                        ),
+                        lote.distancia! >= 1000
+                            ? textoParqProx(
+                                label:
+                                    (lote.distancia! / 1000).toStringAsFixed(1),
+                                tamanho: 18,
+                                cor: Colors.black,
+                                font: FontWeight.bold,
+                              )
+                            : textoParqProx(
+                                label: '${lote.distancia?.toStringAsFixed(0)}',
+                                tamanho: 18,
+                                cor: Colors.black,
+                                font: FontWeight.bold,
+                              ),
                       ],
                     ),
                     Row(
@@ -307,18 +309,19 @@ class listaParquesPertoWidget extends StatelessWidget {
                           cor: corLotacao,
                           font: FontWeight.bold,
                         ),
-                        lote.distancia! >= 1000 ?
-                        textoParqProx(
-                          label: 'Km de si',
-                          tamanho: 14,
-                          cor: Colors.black54,
-                          font: FontWeight.normal,
-                        ) : textoParqProx(
-                          label: 'm de si',
-                          tamanho: 14,
-                          cor: Colors.black54,
-                          font: FontWeight.normal,
-                        ),
+                        lote.distancia! >= 1000
+                            ? textoParqProx(
+                                label: 'Km de si',
+                                tamanho: 14,
+                                cor: Colors.black54,
+                                font: FontWeight.normal,
+                              )
+                            : textoParqProx(
+                                label: 'm de si',
+                                tamanho: 14,
+                                cor: Colors.black54,
+                                font: FontWeight.normal,
+                              ),
                       ],
                     ),
                   ],
@@ -330,7 +333,6 @@ class listaParquesPertoWidget extends StatelessWidget {
       },
     );
   }
-
 }
 
 class textoParqProx extends StatelessWidget {

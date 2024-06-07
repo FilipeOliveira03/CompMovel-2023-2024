@@ -34,7 +34,7 @@ class Lote {
       'latitude': latitude,
       'longitude': longitude,
       'tipoParque': tipoParque,
-      'assertImagem': assertImagem,
+      'assertImagem': 'assets/ImagensParques/$id.png',
     };
   }
 
@@ -62,7 +62,7 @@ class Lote {
       latitude: db['latitude'],
       longitude: db['longitude'],
       tipoParque: db['tipoParque'],
-      assertImagem: 'assets/ImagensParques/${db['id_parque']}.png',
+      assertImagem: 'assets/ImagensParques/${db['id']}.png',
     );
   }
 }
