@@ -119,12 +119,17 @@ class _ListaParquesState extends State<ListaParques> {
                   Lote lote = listaLots[index];
 
                   var lotOcupacao = lote.lotAtual;
+                  var lotMaxima = lote.lotMaxima;
 
                   if (lotOcupacao < 0) {
                     lotOcupacao = lote.lotMaxima;
                   }
 
-                  var lotAtual = lote.lotMaxima - lotOcupacao;
+                  if (lotMaxima <= 0) {
+                    lotMaxima = lotOcupacao;
+                  }
+
+                  var lotAtual = lotMaxima - lotOcupacao;
 
                   var corLotacao;
                   if (lotAtual == 0) {
@@ -161,21 +166,28 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: Colors.black,
                                     font: FontWeight.bold,
                                   ),
-                                  lote.distancia! >= 1000
-                                      ? textoParqProx(
-                                          label: (lote.distancia! / 1000)
-                                              .toStringAsFixed(1),
-                                          tamanho: 18,
-                                          cor: Colors.black,
-                                          font: FontWeight.bold,
-                                        )
+                                  lote.distancia != null
+                                      ? lote.distancia! >= 1000
+                                          ? textoParqProx(
+                                              label: (lote.distancia! / 1000)
+                                                  .toStringAsFixed(1),
+                                              tamanho: 18,
+                                              cor: Colors.black,
+                                              font: FontWeight.bold,
+                                            )
+                                          : textoParqProx(
+                                              label:
+                                                  '${lote.distancia?.toStringAsFixed(0)}',
+                                              tamanho: 18,
+                                              cor: Colors.black,
+                                              font: FontWeight.bold,
+                                            )
                                       : textoParqProx(
-                                          label:
-                                              '${lote.distancia?.toStringAsFixed(0)}',
-                                          tamanho: 18,
+                                          label: 'Indisponível',
+                                          tamanho: 15,
                                           cor: Colors.black,
-                                          font: FontWeight.bold,
-                                        ),
+                                          font: FontWeight.normal,
+                                        )
                                 ],
                               ),
                               Row(
@@ -194,7 +206,8 @@ class _ListaParquesState extends State<ListaParques> {
                                     cor: corLotacao,
                                     font: FontWeight.bold,
                                   ),
-                                  lote.distancia! >= 1000
+                                  lote.distancia != null &&
+                                          lote.distancia! >= 1000
                                       ? textoParqProx(
                                           label: 'Km de si',
                                           tamanho: 14,
@@ -238,7 +251,7 @@ class _ListaParquesState extends State<ListaParques> {
                   ? Icons.arrow_upward
                   : Icons.arrow_downward),
               label: Text(
-                  'Ordenar por Distância ${ordenarPorDistanciaCrescente ? 'decrescente' : 'crescente'}'),
+                  'Ordenar por distância ${ordenarPorDistanciaCrescente ? 'decrescente' : 'crescente'}'),
             ),
             SizedBox(height: 5),
           ],
@@ -390,7 +403,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
                 child: Column(
                   children: [
                     SizedBox(height: 5),
-                    Text('Não têm pesquisas recentes'),
+                    Text('NÃ£o tÃªm pesquisas recentes'),
                   ],
                 ),
               ),

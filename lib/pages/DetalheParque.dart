@@ -28,6 +28,7 @@ class _DetalheParqueState extends State<DetalheParque> {
 
   @override
   Widget build(BuildContext context) {
+
     final parquesRepository = context.read<ParquesRepository>();
 
     var barra = Divider(
@@ -123,9 +124,14 @@ class _informacaoParqueState extends State<informacaoParque> {
         element.cor.toLowerCase() == widget.zona!.tarifa.toLowerCase());
 
     var lotAtual = widget.lote.lotAtual;
+    var lotMaxima = widget.lote.lotMaxima;
 
     if (lotAtual < 0) {
       lotAtual = widget.lote.lotMaxima;
+    }
+
+    if(lotMaxima <= 0){
+      lotMaxima = widget.lote.lotAtual;
     }
 
     return Container(
@@ -178,7 +184,7 @@ class _informacaoParqueState extends State<informacaoParque> {
           ),
           textoInformacoes(
             textoNegrito: 'Lotação: ',
-            textoNormal: '$lotAtual/${widget.lote.lotMaxima}',
+            textoNormal: '$lotAtual/$lotMaxima',
             cor: widget.preto,
           ),
           textoInformacoes(
@@ -226,11 +232,13 @@ class _textoDistanciaState extends State<textoDistancia> {
   Widget build(BuildContext context) {
     var textoDistancia = '';
 
-    if (widget.lote.distancia.toString().length > 3) {
-      textoDistancia =
-          '${widget.lote.distancia! ~/ 1000}.${(widget.lote.distancia! ~/ 100) % 10} km ';
-    } else {
-      textoDistancia = '${widget.lote.distancia} m ';
+    if(widget.lote.distancia != null){
+      if (widget.lote.distancia.toString().length > 3) {
+        textoDistancia =
+        '${widget.lote.distancia! ~/ 1000}.${(widget.lote.distancia! ~/ 100) % 10} km ';
+      } else {
+        textoDistancia = '${widget.lote.distancia} m ';
+      }
     }
 
     return RichText(
@@ -240,7 +248,8 @@ class _textoDistanciaState extends State<textoDistancia> {
           color: Colors.black,
           fontWeight: FontWeight.normal,
         ),
-        children: <TextSpan>[
+        children: widget.lote.distancia != null
+            ? <TextSpan>[
           TextSpan(
             text: 'Parque a ',
           ),
@@ -251,7 +260,12 @@ class _textoDistanciaState extends State<textoDistancia> {
             ),
           ),
           TextSpan(
-            text: 'de si',
+            text: ' de si',
+          ),
+        ]
+            : <TextSpan>[
+          TextSpan(
+            text: 'Informação da distância indisponível',
           ),
         ],
       ),

@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import '../classes/Lote.dart';
-import '../data/ParquesService.dart';
 import '../repository/ParquesRepository.dart';
 import 'DetalheParque.dart';
 
@@ -19,10 +19,11 @@ class Mapa extends StatefulWidget {
 
 class _MapaState extends State<Mapa> {
   List<Lote> minhaListaParques = [];
-  Location _locationController = new Location();
-  final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
+  Location _locationController = Location();
+  final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
 
-  static const LatLng _pGooglePlex = LatLng(37.4223, -122.0848);
+  static const LatLng _pLisboa = LatLng(38.7223, -9.1393);
   LatLng? _currentP = null;
 
   Set<Marker> _markers = {};
@@ -43,19 +44,24 @@ class _MapaState extends State<Mapa> {
   }
 
   void _updateMarkers() {
-    Set<Marker> newMarkers = {
-      Marker(
-        markerId: MarkerId('_currentLocation'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        position: _currentP ?? _pGooglePlex,
-      ),
-    };
+    Set<Marker> newMarkers = {};
+
+    if (_currentP != null) {
+      newMarkers.add(
+        Marker(
+          markerId: MarkerId('_currentLocation'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          position: _currentP ?? _pLisboa,
+        ),
+      );
+    }
 
     for (var parque in minhaListaParques) {
       newMarkers.add(
         Marker(
           markerId: MarkerId(parque.nome),
-          position: LatLng(double.parse(parque.latitude), double.parse(parque.longitude)),
+          position: LatLng(
+              double.parse(parque.latitude), double.parse(parque.longitude)),
           infoWindow: InfoWindow(
             title: parque.nome,
           ),
@@ -74,21 +80,18 @@ class _MapaState extends State<Mapa> {
     _markers = newMarkers;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _currentP == null
-          ? const Center(
-        child: CircularProgressIndicator(),
-      ) : GoogleMap(
-        onMapCreated: (GoogleMapController controller) => _mapController.complete(controller),
-        initialCameraPosition: CameraPosition(
-          target: _pGooglePlex,
-          zoom: 13,
-        ),
-        markers: _markers,
-      ),
+      body: GoogleMap(
+              onMapCreated: (GoogleMapController controller) =>
+                  _mapController.complete(controller),
+              initialCameraPosition: CameraPosition(
+                target: _pLisboa,
+                zoom: 13,
+              ),
+              markers: _markers,
+            ),
     );
   }
 
@@ -123,10 +126,21 @@ class _MapaState extends State<Mapa> {
       }
     }
 
-    _locationController.onLocationChanged.listen((LocationData currentLocation) {
-      if (currentLocation.latitude != null && currentLocation.longitude != null) {
+    _locationController.onLocationChanged
+        .listen((LocationData currentLocation) {
+      if (currentLocation.latitude != null &&
+          currentLocation.longitude != null) {
         setState(() {
-          _currentP = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+          _currentP =
+              LatLng(currentLocation.latitude!, currentLocation.longitude!);
+          for (var parque in minhaListaParques) {
+            parque.distancia = Geolocator.distanceBetween(
+              _currentP!.latitude,
+              _currentP!.longitude,
+              double.parse(parque.latitude),
+              double.parse(parque.longitude),
+            );
+          }
           _updateMarkers();
           _cameraToPosition(_currentP!);
         });

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../classes/Lote.dart';
+import '../data/parquesDatabase.dart';
 import 'DetalheParque.dart';
 import 'Mapa.dart';
 
@@ -14,7 +15,13 @@ class Dashboard extends StatelessWidget {
   Dashboard({super.key});
 
   String textoLabel(Incidente incidente) {
-    return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, às ${incidente.data.hour}:${incidente.data.minute}!';
+    var nomeParque = incidente.nomeParque.split(' ');
+
+    if (nomeParque.contains('Parque')) {
+      return '   ⚠️   Incidente reportado no ${incidente.nomeParque}, às ${incidente.data.hour}:${incidente.data.minute}!';
+    } else {
+      return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, às ${incidente.data.hour}:${incidente.data.minute}!';
+    }
   }
 
   Future<Position> _getCurrentLocation() async {
@@ -48,19 +55,6 @@ class Dashboard extends StatelessWidget {
 
     listaIncidentesTotais.sort((a, b) => b.data.compareTo(a.data));
 
-    var incidente;
-    if (listaIncidentesTotais.isEmpty) {
-      incidente = '       Não foram reportados incidentes recentemente!';
-    } else if (listaIncidentesTotais.length == 1) {
-      incidente = textoLabel(listaIncidentesTotais[0]);
-    } else if (listaIncidentesTotais.length == 2) {
-      incidente =
-          '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])}';
-    } else {
-      incidente =
-          '${textoLabel(listaIncidentesTotais[0])} ${textoLabel(listaIncidentesTotais[1])} ${textoLabel(listaIncidentesTotais[2])}';
-    }
-
     var barra = Divider(
       height: 20,
       thickness: 2,
@@ -78,17 +72,7 @@ class Dashboard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             barra,
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.03,
-              width: MediaQuery.of(context).size.width * 0.92,
-              child: Marquee(
-                text: incidente,
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-                velocity: 40,
-              ),
-            ),
+            buildIncidentesWidget(),
             barra,
             textoInfoWidget(texto1: 'Parques próximos'),
             SizedBox(
@@ -106,10 +90,10 @@ class Dashboard extends StatelessWidget {
               child: FutureBuilder(
                 future: _getCurrentLocation(),
                 builder: (context, AsyncSnapshot<Position> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Erro ao obter localização'));
+                  if (snapshot.hasError) {
+                    return tresParquesProxWidget(
+                      userLocation: null,
+                    );
                   } else {
                     Position? position = snapshot.data;
                     return tresParquesProxWidget(
@@ -121,6 +105,83 @@ class Dashboard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class buildIncidentesWidget extends StatelessWidget {
+  const buildIncidentesWidget({
+    super.key,
+  });
+
+  String textoLabel(Incidente incidente) {
+    var nomeParque = incidente.nomeParque.split(' ');
+
+    if (nomeParque.contains('Parque')) {
+      return '   ⚠️   Incidente reportado no ${incidente.nomeParque}, às ${incidente.data.hour.toString().padLeft(2, '0')}:${incidente.data.minute.toString().padLeft(2, '0')}!';
+    } else {
+      return '   ⚠️   Incidente reportado no Parque ${incidente.nomeParque}, às ${incidente.data.hour.toString().padLeft(2, '0')}:${incidente.data.minute.toString().padLeft(2, '0')}!';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final database = context.read<ParquesDatabase>();
+
+    return FutureBuilder(
+        future: database.getIncidentesRecentes(),
+        builder: (_, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('${snapshot.error}'),
+              );
+            } else {
+              return buildIncidentes(snapshot.data ?? [], context);
+            }
+          }
+        });
+  }
+
+  SizedBox buildIncidentes(List<Incidente> incidentes, BuildContext context) {
+    incidentes.sort((a, b) => b.data.compareTo(a.data));
+
+    incidentes.sort((a, b) {
+      if (b.data.hour != a.data.hour) {
+        return b.data.hour.compareTo(a.data.hour);
+      } else if (b.data.minute != a.data.minute) {
+        return b.data.minute.compareTo(a.data.minute);
+      } else {
+        return b.data.second.compareTo(a.data.second);
+      }
+    });
+
+    String incidente;
+    if (incidentes.isEmpty) {
+      incidente = '       Não foram reportados incidentes recentemente!';
+    } else if (incidentes.length == 1) {
+      incidente = textoLabel(incidentes[0]);
+    } else if (incidentes.length == 2) {
+      incidente = '${textoLabel(incidentes[0])} ${textoLabel(incidentes[1])}';
+    } else {
+      incidente =
+          '${textoLabel(incidentes[0])} ${textoLabel(incidentes[1])} ${textoLabel(incidentes[2])}';
+    }
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.03,
+      width: MediaQuery.of(context).size.width * 0.92,
+      child: Marquee(
+        text: incidente,
+        style: TextStyle(
+          fontSize: 18,
+        ),
+        velocity: 40,
       ),
     );
   }
@@ -233,13 +294,18 @@ class listaParquesPertoWidget extends StatelessWidget {
       itemBuilder: (context, index) {
         Lote lote = lista[index];
 
-        var lotOcupada = lote.lotAtual;
+        var lotOcupacao = lote.lotAtual;
+        var lotMaxima = lote.lotMaxima;
 
-        if (lotOcupada < 0) {
-          lotOcupada = lote.lotMaxima;
+        if (lotOcupacao < 0) {
+          lotOcupacao = lote.lotMaxima;
         }
 
-        var lotAtual = lote.lotMaxima - lotOcupada;
+        if (lotMaxima <= 0) {
+          lotMaxima = lotOcupacao;
+        }
+
+        var lotAtual = lotMaxima - lotOcupacao;
 
         var corLotacao;
 
@@ -278,20 +344,28 @@ class listaParquesPertoWidget extends StatelessWidget {
                           cor: Colors.black,
                           font: FontWeight.bold,
                         ),
-                        lote.distancia! >= 1000
-                            ? textoParqProx(
-                                label:
-                                    (lote.distancia! / 1000).toStringAsFixed(1),
-                                tamanho: 18,
-                                cor: Colors.black,
-                                font: FontWeight.bold,
-                              )
+                        lote.distancia != null
+                            ? lote.distancia! >= 1000
+                                ? textoParqProx(
+                                    label: (lote.distancia! / 1000)
+                                        .toStringAsFixed(1),
+                                    tamanho: 18,
+                                    cor: Colors.black,
+                                    font: FontWeight.bold,
+                                  )
+                                : textoParqProx(
+                                    label:
+                                        '${lote.distancia?.toStringAsFixed(0)}',
+                                    tamanho: 18,
+                                    cor: Colors.black,
+                                    font: FontWeight.bold,
+                                  )
                             : textoParqProx(
-                                label: '${lote.distancia?.toStringAsFixed(0)}',
-                                tamanho: 18,
+                                label: 'Indisponível',
+                                tamanho: 15,
                                 cor: Colors.black,
-                                font: FontWeight.bold,
-                              ),
+                                font: FontWeight.normal,
+                              )
                       ],
                     ),
                     Row(
@@ -309,7 +383,7 @@ class listaParquesPertoWidget extends StatelessWidget {
                           cor: corLotacao,
                           font: FontWeight.bold,
                         ),
-                        lote.distancia! >= 1000
+                        lote.distancia != null && lote.distancia! >= 1000
                             ? textoParqProx(
                                 label: 'Km de si',
                                 tamanho: 14,
