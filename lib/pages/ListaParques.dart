@@ -129,6 +129,10 @@ class _ListaParquesState extends State<ListaParques> {
                     lotMaxima = lotOcupacao;
                   }
 
+                  if(lote.lotAtual > lote.lotMaxima){
+                    lotOcupacao = lote.lotMaxima;
+                  }
+
                   var lotAtual = lotMaxima - lotOcupacao;
 
                   var corLotacao;
@@ -403,7 +407,7 @@ class _SearchBarAppState extends State<SearchBarApp> {
                 child: Column(
                   children: [
                     SizedBox(height: 5),
-                    Text('NÃ£o tÃªm pesquisas recentes'),
+                    Text('Não têm pesquisas recentes'),
                   ],
                 ),
               ),

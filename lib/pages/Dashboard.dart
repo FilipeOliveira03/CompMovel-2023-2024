@@ -305,6 +305,10 @@ class listaParquesPertoWidget extends StatelessWidget {
           lotMaxima = lotOcupacao;
         }
 
+        if(lote.lotAtual > lote.lotMaxima){
+          lotOcupacao = lote.lotMaxima;
+        }
+
         var lotAtual = lotMaxima - lotOcupacao;
 
         var corLotacao;

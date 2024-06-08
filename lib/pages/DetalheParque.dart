@@ -134,6 +134,10 @@ class _informacaoParqueState extends State<informacaoParque> {
       lotMaxima = widget.lote.lotAtual;
     }
 
+    if(widget.lote.lotAtual > widget.lote.lotMaxima){
+      lotAtual = widget.lote.lotMaxima;
+    }
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.48,
       child: Column(
@@ -235,9 +239,9 @@ class _textoDistanciaState extends State<textoDistancia> {
     if(widget.lote.distancia != null){
       if (widget.lote.distancia.toString().length > 3) {
         textoDistancia =
-        '${widget.lote.distancia! ~/ 1000}.${(widget.lote.distancia! ~/ 100) % 10} km ';
+        '${widget.lote.distancia! ~/ 1000}.${(widget.lote.distancia! ~/ 100) % 10} km';
       } else {
-        textoDistancia = '${widget.lote.distancia} m ';
+        textoDistancia = '${widget.lote.distancia} m';
       }
     }
 

@@ -52,7 +52,6 @@ class ParquesServices extends IParquesRepository{
 
       List<Lote> lots =
       lotsJson.map((parquesJson) => Lote.fromJSON(parquesJson)).toList();
-
       return lots;
     } else {
       throw Exception('status code: ${response.statusCode}');
