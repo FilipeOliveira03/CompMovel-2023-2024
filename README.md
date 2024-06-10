@@ -25,6 +25,8 @@ Na lista de parques, podemos encontrar 3 funcionalidades:
     - Uma lista com todos os parques, em que terá informação básica sobre o parque, como nome, distancia ao utilizador, tipo de parque e número de lugares vazios;
     - Um butão que permite ordenar a lista de parques por ordem crescente e decrescente.    
 
+Relativamente aos parques com lotação negativa, consideramos que esses parques teriam a mesma lotação da lotação máxima, ou seja, totada.
+
 -**Detalhes de um parque**:
 
 ![img_2.png](imagesReadMe/img_2.png)
