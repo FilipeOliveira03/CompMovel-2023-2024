@@ -84,7 +84,7 @@ No entanto, o utilizador pode recusar essa permissão. Ao recusar, o utilizador 
 
 O registo de incidentes é guardado de forma pressistente na aplicação. O utilizador ao "matar" a aplicação continua a saber qual os incidentes que foram reportados nos parques.
 
-Toda esta informação descrita acima encontra-se mais detalhada no seguinte vídeo:
+*Toda esta informação descrita acima encontra-se mais detalhada no seguinte vídeo:*https://youtu.be/mnyqrCAiax8
 
 **Arquitetura da aplicação:**
 
