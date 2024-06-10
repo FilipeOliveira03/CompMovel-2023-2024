@@ -1,5 +1,3 @@
-import 'Incidente.dart';
-
 class Lote {
   String id;
   String nome;
@@ -23,6 +21,8 @@ class Lote {
     required this.tipoParque,
     this.assertImagem,
   });
+
+
 
   Map<String, dynamic> toDb() {
     return {

@@ -58,8 +58,4 @@ class Incidente {
 
 }
 
-class ListaIncidente {
-  List<Incidente> incidentes = [];
 
-  ListaIncidente();
-}

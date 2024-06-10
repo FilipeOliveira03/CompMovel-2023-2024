@@ -9,6 +9,7 @@ class Tarifa {
     required this.duracaoMax,
   });
 }
+
 class Tarifas{
   List<Tarifa> tarifas = [
     Tarifa(cor: 'Verde', preco: 0.8, duracaoMax: 4),

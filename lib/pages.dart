@@ -7,8 +7,6 @@ import 'pages/Mapa.dart';
 import 'pages/RegistoIncidentes.dart';
 
 
-final ListaIncidente minhaListaIncidentes = ListaIncidente();
-
 final pages = [
   (title: 'Home', icon: Icons.home, widget: Dashboard()),
   (title: 'Parques', icon: Icons.list, widget: ListaParques()),

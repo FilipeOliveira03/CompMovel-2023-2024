@@ -51,9 +51,6 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var listaIncidentesTotais = minhaListaIncidentes.incidentes.toList();
-
-    listaIncidentesTotais.sort((a, b) => b.data.compareTo(a.data));
 
     var barra = Divider(
       height: 20,

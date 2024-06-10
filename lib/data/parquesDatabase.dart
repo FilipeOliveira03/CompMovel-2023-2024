@@ -64,15 +64,6 @@ class ParquesDatabase extends IParquesRepository {
     return result.map((entry) => Lote.fromDB(entry)).toList();
   }
 
-  // Future<List<Lote>> getLote(String idParque) async {
-  //   if (_database == null) {
-  //     throw Exception('DB not initialized');
-  //   }
-  //
-  //   List result = await _database!.rawQuery("SELECT * FROM Zone WHERE idParque = '$idParque'");
-  //
-  //   return result.map((entry) => Lote.fromDB(entry)).toList();
-  // }
 
   Future<Zone> getZones(String idParque) async {
     if (_database == null) {

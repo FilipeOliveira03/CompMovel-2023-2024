@@ -54,15 +54,7 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
     });
   }
 
-  void adicionarIncidenteAoParqueSelecionado(var minhaListaParques, Incidente incidente) {
-    Lote? parqueSelecionado = minhaListaParques.firstWhere(
-          (parque) => parque.nome == nomeParque,
-    );
 
-    if (parqueSelecionado != null) {
-      minhaListaIncidentes.incidentes.add(incidente);
-    }
-  }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -166,8 +158,6 @@ class IncidenteFormScreenState extends State<RegistoIncidentes> {
               descricaoDetalhada: descricaoDetalhada,
               gravidade: gravidade.toInt(),
             );
-            
-            adicionarIncidenteAoParqueSelecionado(minhaListaParques, novoIncidente);
 
             database.insertIncidente(novoIncidente);
 

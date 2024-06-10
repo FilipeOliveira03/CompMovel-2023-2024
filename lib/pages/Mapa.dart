@@ -24,7 +24,7 @@ class _MapaState extends State<Mapa> {
       Completer<GoogleMapController>();
 
   static const LatLng _pLisboa = LatLng(38.7223, -9.1393);
-  LatLng? _currentP = null;
+  LatLng? _currentP;
 
   Set<Marker> _markers = {};
 
